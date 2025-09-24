@@ -57,6 +57,46 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define BLE_System_Key_Pin GPIO_PIN_0
+#define BLE_System_Key_GPIO_Port GPIOC
+#define Debug_LED_Pin GPIO_PIN_1
+#define Debug_LED_GPIO_Port GPIOC
+#define Helice_Pin GPIO_PIN_2
+#define Helice_GPIO_Port GPIOA
+#define IMU_Interrupt_Pin GPIO_PIN_0
+#define IMU_Interrupt_GPIO_Port GPIOB
+#define IMU_Reset_Pin GPIO_PIN_1
+#define IMU_Reset_GPIO_Port GPIOB
+#define Servo_1_Pin GPIO_PIN_12
+#define Servo_1_GPIO_Port GPIOD
+#define Servo_2_Pin GPIO_PIN_13
+#define Servo_2_GPIO_Port GPIOD
+#define Servo_3_Pin GPIO_PIN_14
+#define Servo_3_GPIO_Port GPIOD
+#define Servo_4_Pin GPIO_PIN_15
+#define Servo_4_GPIO_Port GPIOD
+#define Debug_UART_TX_Pin GPIO_PIN_9
+#define Debug_UART_TX_GPIO_Port GPIOA
+#define Debug_UART_RX_Pin GPIO_PIN_10
+#define Debug_UART_RX_GPIO_Port GPIOA
+#define BLE_UART_CTS_Pin GPIO_PIN_3
+#define BLE_UART_CTS_GPIO_Port GPIOD
+#define BLE_UART_RTS_Pin GPIO_PIN_4
+#define BLE_UART_RTS_GPIO_Port GPIOD
+#define BLE_UART_TX_Pin GPIO_PIN_5
+#define BLE_UART_TX_GPIO_Port GPIOD
+#define BLE_UART_RX_Pin GPIO_PIN_6
+#define BLE_UART_RX_GPIO_Port GPIOD
+#define Buzzer_Pin GPIO_PIN_4
+#define Buzzer_GPIO_Port GPIOB
+#define IMU_I2C_SCL_Pin GPIO_PIN_6
+#define IMU_I2C_SCL_GPIO_Port GPIOB
+#define IMU_I2C_SDA_Pin GPIO_PIN_7
+#define IMU_I2C_SDA_GPIO_Port GPIOB
+#define IMU_Bootloader_Select_Pin GPIO_PIN_8
+#define IMU_Bootloader_Select_GPIO_Port GPIOB
+#define IMU_I2C_Address_Select_Pin GPIO_PIN_9
+#define IMU_I2C_Address_Select_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
