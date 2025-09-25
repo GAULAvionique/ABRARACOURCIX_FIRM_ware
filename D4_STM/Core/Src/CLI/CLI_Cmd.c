@@ -16,7 +16,7 @@
 
 
 static char bufferTX[150] = {0};
-static char bufferStats[512] = {0};
+//static char bufferStats[512] = {0};
 
 /* DONT FORGET TO UPDATE THE DEFINE WHEN ADDING A COMMAND*/ //TODO FIX this
 

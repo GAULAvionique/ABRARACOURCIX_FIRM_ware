@@ -46,7 +46,9 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#define bool int
+#define true 1
+#define false 0
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
