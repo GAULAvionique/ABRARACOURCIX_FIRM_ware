@@ -33,3 +33,13 @@ uint32_t Servo_GetPosition(sServoCtrl_t* sServoCtrl)
 {
 	return Timers_GetDutyCycle(sServoCtrl->sServoHW.tim_PWM, sServoCtrl->sServoHW.uTimChan);
 }
+
+
+
+void Servos_CLI_SetPositioAll(float fPos)
+{
+	for(uint8_t uIndex = 0; uIndex < NUMBER_OF_SERVO; uIndex++)
+	{
+		Servo_SetPosition(&sServoCtrl[uIndex], fPos);
+	}
+}

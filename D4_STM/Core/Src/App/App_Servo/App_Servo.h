@@ -44,6 +44,7 @@ typedef struct sServoCtrl_t{
 
 bool Servo_SetPosition(sServoCtrl_t* sServoCtrl, float uPosition);
 uint32_t Servo_GetPosition(sServoCtrl_t* sServoCtrl);
+void Servos_CLI_SetPositioAll(float fPos);
 
 
 

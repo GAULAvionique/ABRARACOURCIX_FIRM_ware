@@ -12,7 +12,8 @@
 #include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
-#define NUMER_OF_CMD		(1)
+#include "App_Servo/App_Servo.h"
+#define NUMER_OF_CMD		(2)
 
 
 static char bufferTX[150] = {0};
@@ -25,7 +26,11 @@ CLI_Command_Definition_t CLI_def[] =
 {{	.pcCommand = "Hello",
 	.pcHelpString = "Hello\n\r",
 	.pxCommandInterpreter = CLICmd_Hello_Func,
-	.cExpectedNumberOfParameters = 0}
+	.cExpectedNumberOfParameters = 0},
+{	.pcCommand = "sva",
+	.pcHelpString = "ServoAll\n\r",
+	.pxCommandInterpreter = CLICmd_ServoAllPosition,
+	.cExpectedNumberOfParameters = 1}
 
 };
 
@@ -55,3 +60,13 @@ BaseType_t CLICmd_Hello_Func(char *pcWriteBuffer, size_t xWriteBufferLen, const 
 }
 
 
+BaseType_t CLICmd_ServoAllPosition(char *pcWriteBuffer, size_t xWriteBufferLen, const char *pcCommandString)
+{
+	uint32_t uSize = 0;
+
+
+	float fPosition = (float)(atof(FreeRTOS_CLIGetParameter(pcCommandString, (BaseType_t)1, (BaseType_t*)&uSize)));
+
+	Servos_CLI_SetPositioAll(fPosition);
+	return 0;
+}

@@ -10,6 +10,7 @@
 
 #include "App_Servo/App_Servo.h"
 
+void CtrlServo_Init(void);
 
 
 
