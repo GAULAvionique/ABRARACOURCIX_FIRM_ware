@@ -61,8 +61,6 @@ void Error_Handler(void);
 #define BLE_System_Key_GPIO_Port GPIOC
 #define Debug_LED_Pin GPIO_PIN_1
 #define Debug_LED_GPIO_Port GPIOC
-#define Helice_Pin GPIO_PIN_2
-#define Helice_GPIO_Port GPIOA
 #define IMU_Interrupt_Pin GPIO_PIN_0
 #define IMU_Interrupt_GPIO_Port GPIOB
 #define IMU_Reset_Pin GPIO_PIN_1

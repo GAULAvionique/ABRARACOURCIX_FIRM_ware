@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Motor/motor.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -64,6 +64,8 @@ const osThreadAttr_t xCLI_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+
+void CLI(void *argument);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -125,10 +127,17 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
+	int f = 1000;
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  /*Motor_SetSpeed(f);
+	  if(f == 1000){
+		  f = 2000;
+	  } else {
+		  f = 1000;
+	  }*/
+	  osDelay(2000);
   }
   /* USER CODE END StartDefaultTask */
 }
