@@ -135,13 +135,14 @@ void CLI_Send(uint8_t *uChar, uint16_t size)
 
 
 }
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+
+/*void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	FIFO_Update(&cRxedChar, 0x1);
 	HAL_UART_Receive_DMA(huart, &cRxedChar, 1);
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(xSemaphore, &xHigherPriorityTaskWoken);
-}
+}*/
 
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)

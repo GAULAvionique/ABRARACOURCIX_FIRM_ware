@@ -12,4 +12,6 @@ void Motor_Init(void);
 
 void Motor_SetSpeed(uint16_t pulse_width_us);
 
+void Motor_Stop(void);
+
 #endif /* SRC_MOTOR_MOTOR_H_ */

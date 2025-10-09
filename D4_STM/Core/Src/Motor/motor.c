@@ -28,6 +28,12 @@ void Motor_SetSpeed(uint16_t pulse_width_us) {
     if (pulse_width_us > 2000) pulse_width_us = 2000;
 
     // Set initial pulse width (1 ms = 1000 ticks)
-    __HAL_TIM_SET_COMPARE(&htim5, TIM_CHANNEL_3, pulse_width_us);
+    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, pulse_width_us);
+}
+
+// Function to stop the motor
+void Motor_Stop(void) {
+    // Set PWM to minimum throttle
+	HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_1);
 }
 

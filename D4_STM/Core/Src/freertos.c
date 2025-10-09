@@ -26,6 +26,11 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Motor/motor.h"
+#include "BLE/BLE.h"
+#include "CLI/CLI.h"
+#include "CLI/CLI_Cmd.h"
+#include "string.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -127,18 +132,21 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-	int f = 1000;
+	//int f = 1000;
   /* Infinite loop */
-  for(;;)
-  {
+	uint8_t current_byte = 0;
+	for(;;)
+	{
+	  BLE_SendString("HELLO PC!");
+	  BLE_ReceiveByte(&current_byte);
 	  /*Motor_SetSpeed(f);
 	  if(f == 1000){
 		  f = 2000;
 	  } else {
 		  f = 1000;
 	  }*/
-	  osDelay(2000);
-  }
+	  osDelay(500);
+	}
   /* USER CODE END StartDefaultTask */
 }
 
