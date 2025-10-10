@@ -26,11 +26,19 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "tim.h"
+#include "stm32f4xx_hal_i2c.h"
+#include "i2c.h"
+#include "CLI.h"
+#include <stdio.h>
+#include <string.h>
+#include "App/App_Time/App_Time.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+uint8_t i2c_done = 0;
+uint32_t uTime1 = 0;
+uint32_t delta = 0;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -51,7 +59,7 @@
 osThreadId_t defaultTaskHandle;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
-  .stack_size = 128 * 4,
+  .stack_size = 2400 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for xCLI */
@@ -125,10 +133,50 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
+	static char CLI_BUFF[100] = {0};
 	CtrlServo_Init();
+	uint8_t RX_Buffer[100] = {};
+	uint8_t reg_config[] = {0x3D, 0x00} ;
+	HAL_I2C_Master_Transmit_DMA(&hi2c1 , 0x28 << 1, reg_config, 2);
+	HAL_Delay(1000);
+	uint8_t reg_config_fu[] = {0x3D, 0x0C} ;
+	HAL_I2C_Master_Transmit_DMA(&hi2c1 , 0x28 << 1, reg_config_fu, 2);
+	HAL_Delay(1000);
+	//ID
+	uint8_t reg_D = 0x00;
+	HAL_I2C_Master_Transmit_DMA(&hi2c1 , 0x28 << 1, &reg_D, 1);
+
+    HAL_I2C_Master_Receive_DMA(&hi2c1 , 0x28 << 1, (uint8_t *)RX_Buffer, 1); //Receiving in DMA mode
+    HAL_Delay(1000);
+	uint8_t reg_gyro = 0x20;
+	HAL_I2C_Master_Transmit_DMA(&hi2c1 , 0x28 << 1, &reg_gyro, 1);
+	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY);
+
+
   /* Infinite loop */
   for(;;)
   {
+	  /* USER CODE BEGIN 2 */
+	HAL_Delay(8);
+
+
+	uTime1 = AppTime_GetTimeMs();
+	HAL_I2C_Master_Receive_DMA(&hi2c1 , 0x28 << 1, (uint8_t *)RX_Buffer, 20);
+	//Receiving in DMA mode
+	while(!i2c_done);
+	i2c_done = 0;
+	int16_t w = (int16_t)((RX_Buffer[1] << 8) | RX_Buffer[0]);
+    int16_t x = (int16_t)((RX_Buffer[3] << 8) | RX_Buffer[2]);
+    int16_t y = (int16_t)((RX_Buffer[5] << 8) | RX_Buffer[4]);
+    int16_t z = (int16_t)((RX_Buffer[7] << 8) | RX_Buffer[6]);
+    float gyro_w_dps = (float)w / 16384.0;  // °/s
+    float gyro_x_dps = (float)x / 16384.0;  // °/s
+    float gyro_y_dps = (float)y / 16384.0;
+    float gyro_z_dps = (float)z / 16384.0;
+
+    uint16_t uSize = snprintf(CLI_BUFF,sizeof(CLI_BUFF), "%.2f; %.2f; %.2f; %.2f;\r\n", gyro_w_dps, gyro_x_dps, gyro_y_dps, gyro_z_dps);
+    CLI_Send((uint8_t*)CLI_BUFF, uSize);
+	  /* USER CODE END 2 */
 
   }
   /* USER CODE END StartDefaultTask */
@@ -154,6 +202,11 @@ void CLI(void *argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c) {
+    if (hi2c->Instance == I2C1) {
+        i2c_done = 1; // RX finished
+        delta = AppTime_GetTimeMs();
+        delta = delta - uTime1;
+    }}
 /* USER CODE END Application */
 
