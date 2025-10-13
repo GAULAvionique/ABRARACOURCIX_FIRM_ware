@@ -31,6 +31,7 @@
 #include "CLI/CLI_Cmd.h"
 #include "string.h"
 
+#include "Servo/Servo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -135,8 +136,16 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
 	uint8_t current_byte = 0;
 	BLE_Init();
-	for(;;)
-	{
+  float angle1 = 0.05;
+  float angle2 = 0.06;
+  /* Infinite loop */
+  for(;;)
+  {
+	  //
+	  setAllServos(angle1);
+	  osDelay(1000);
+	  setAllServos(angle2);
+	  osDelay(1000);
 	  BLE_SendString("HELLO PC!");
 	  //BLE_ReceiveByte(&current_byte);
 
