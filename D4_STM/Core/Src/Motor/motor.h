@@ -10,7 +10,7 @@
 
 void Motor_Init(void);
 
-void Motor_SetSpeed(uint16_t pulse_width_us);
+void Motor_SetSpeed(uint8_t pulse_width_us);
 
 void Motor_Stop(void);
 

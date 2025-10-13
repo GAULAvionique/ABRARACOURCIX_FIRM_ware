@@ -22,7 +22,6 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-#include "Servo/Servo.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -135,26 +134,21 @@ void StartDefaultTask(void *argument)
 	//int f = 1000;
   /* Infinite loop */
 	uint8_t current_byte = 0;
+	BLE_Init();
 	for(;;)
 	{
 	  BLE_SendString("HELLO PC!");
-	  BLE_ReceiveByte(&current_byte);
-	  /*Motor_SetSpeed(f);
-	  if(f == 1000){
-		  f = 2000;
-	  } else {
-		  f = 1000;
-	  }*/
-    //
-	  setServoDuty(1, 0.15);
-	  setServoDuty(2, 0.15);
-	  setServoDuty(3, 0.15);
+	  //BLE_ReceiveByte(&current_byte);
+
+	  //setServoDuty(1, 0.15);
+	  //setServoDuty(2, 0.15);
+	  //setServoDuty(3, 0.15);
 	  //AppTime_TaskDelayMs(1000)
-	  osDelay(1000);
-	  setServoDuty(1, 0.53);
-	  setServoDuty(2, 0.53);
-	  setServoDuty(3, 0.53);
-	  osDelay(1000);
+	  //osDelay(1000);
+	  //setServoDuty(1, 0.53);
+	  //setServoDuty(2, 0.53);
+	  //setServoDuty(3, 0.53);
+	  //osDelay(1000);
 	  //TIM4->CCR1 = 8000;
 	  //AppTime_TaskDelayMs(1000)
 	  //osDelay(500);

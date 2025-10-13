@@ -12,7 +12,7 @@
 
 #include "stm32f4xx_hal.h"
 
-#define BLE_RX_BUFFER_SIZE 64
+void BLE_Init(void);
 
 void BLE_SendString(const char *str);
 
