@@ -22,6 +22,7 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "Servo/Servo.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -70,7 +71,6 @@ const osThreadAttr_t xCLI_attributes = {
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
-void CLI(void *argument);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -145,6 +145,19 @@ void StartDefaultTask(void *argument)
 	  } else {
 		  f = 1000;
 	  }*/
+    //
+	  setServoDuty(1, 0.15);
+	  setServoDuty(2, 0.15);
+	  setServoDuty(3, 0.15);
+	  //AppTime_TaskDelayMs(1000)
+	  osDelay(1000);
+	  setServoDuty(1, 0.53);
+	  setServoDuty(2, 0.53);
+	  setServoDuty(3, 0.53);
+	  osDelay(1000);
+	  //TIM4->CCR1 = 8000;
+	  //AppTime_TaskDelayMs(1000)
+	  //osDelay(500);
 	  osDelay(500);
 	}
   /* USER CODE END StartDefaultTask */
