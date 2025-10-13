@@ -35,47 +35,6 @@ void BLE_SendData(uint8_t *data, uint16_t size) {
     HAL_UART_Transmit(&huart2, data, size, HAL_MAX_DELAY);
 }
 
-
-uint8_t BLE_ReceiveByte(uint8_t *byte) {
-    // Expect exactly 4 bytes: command + 3 digits (e.g. "C075")
-    if (HAL_UART_Receive(&huart2, byte, 4, HAL_MAX_DELAY) == HAL_OK)
-    {
-        switch (byte[0])
-        {
-            case 'A':
-                Motor_Init();
-                break;
-
-            case 'B':
-                Motor_Stop();
-                break;
-
-            case 'C':
-            {
-                // Copy next 3 bytes as an ASCII number string
-                char number_string[4];
-                memcpy(number_string, &byte[1], 3);
-                number_string[3] = '\0';
-
-                // Convert to integer
-                uint8_t value = (uint8_t)atoi(number_string);
-                if (value > 100)
-                    value = 100;
-
-                // Apply motor speed
-                Motor_SetSpeed(value);
-                break;
-            }
-
-            default:
-                // Unknown command — ignore or handle error
-                break;
-        }
-    }
-
-    return 0;
-}
-
 void BLE_ProcessCommand(uint8_t *cmd) {
     switch (cmd[0])
     {

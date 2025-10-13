@@ -136,11 +136,11 @@ void StartDefaultTask(void *argument)
   /* Infinite loop */
 	uint8_t current_byte = 0;
 	BLE_Init();
-  float angle1 = 0.05;
-  float angle2 = 0.06;
-  /* Infinite loop */
-  for(;;)
-  {
+	float angle1 = 0.05;
+	float angle2 = 0.055;
+	/* Infinite loop */
+	for(;;)
+	{
 	  //
 	  setAllServos(angle1);
 	  osDelay(1000);
