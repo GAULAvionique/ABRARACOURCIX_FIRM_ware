@@ -22,11 +22,10 @@
 #include "task.h"
 #include "main.h"
 #include "cmsis_os.h"
-#include "Servo/Servo.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Servo/Servo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -129,18 +128,15 @@ void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
 
+  float angle1 = 0.05;
+  float angle2 = 0.06;
   /* Infinite loop */
   for(;;)
   {
 	  //
-	  setServoDuty(1, 0.15);
-	  setServoDuty(2, 0.15);
-	  setServoDuty(3, 0.15);
-	  //AppTime_TaskDelayMs(1000)
+	  setAllServos(angle1);
 	  osDelay(1000);
-	  setServoDuty(1, 0.53);
-	  setServoDuty(2, 0.53);
-	  setServoDuty(3, 0.53);
+	  setAllServos(angle2);
 	  osDelay(1000);
 	  //TIM4->CCR1 = 8000;
 	  //AppTime_TaskDelayMs(1000)
