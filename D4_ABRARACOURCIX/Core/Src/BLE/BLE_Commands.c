@@ -5,8 +5,8 @@
  *      Author: Etienne
  */
 
-#include "BLE/BLE_Commands.h"
-#include "Motor/motor.h"
+#include "BLE_Commands.h"
+#include "../Motor/motor.h"
 #include <stdlib.h>
 #include <string.h>
 

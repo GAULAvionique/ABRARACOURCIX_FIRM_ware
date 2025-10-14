@@ -6,7 +6,7 @@
  */
 
 #include "BLE.h"
-#include "BLE/BLE_Commands.h"
+#include "BLE_Commands.h"
 
 #include "usart.h"
 #include "stm32f4xx_it.h"
