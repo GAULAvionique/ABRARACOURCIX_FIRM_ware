@@ -1,0 +1,2 @@
+../Core/Src/Servo/Servo.c:11:6:setServoDuty	24	static
+../Core/Src/Servo/Servo.c:47:6:setAllServos	16	static
