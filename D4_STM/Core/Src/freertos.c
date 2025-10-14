@@ -132,36 +132,17 @@ void MX_FREERTOS_Init(void) {
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
-	//int f = 1000;
-  /* Infinite loop */
-	uint8_t current_byte = 0;
 	BLE_Init();
-	float angle1 = 0.05;
-	float angle2 = 0.055;
+	float angle1 = 0.048;
+	float angle2 = 0.128;
 	/* Infinite loop */
 	for(;;)
 	{
-	  //
-	  setAllServos(angle1);
-	  osDelay(1000);
-	  setAllServos(angle2);
-	  osDelay(1000);
-	  BLE_SendString("HELLO PC!");
-	  //BLE_ReceiveByte(&current_byte);
-
-	  //setServoDuty(1, 0.15);
-	  //setServoDuty(2, 0.15);
-	  //setServoDuty(3, 0.15);
-	  //AppTime_TaskDelayMs(1000)
-	  //osDelay(1000);
-	  //setServoDuty(1, 0.53);
-	  //setServoDuty(2, 0.53);
-	  //setServoDuty(3, 0.53);
-	  //osDelay(1000);
-	  //TIM4->CCR1 = 8000;
-	  //AppTime_TaskDelayMs(1000)
-	  //osDelay(500);
-	  osDelay(500);
+		setAllServos(angle1);
+		osDelay(100);
+		setAllServos(angle2);
+		osDelay(100);
+		BLE_SendString("HELLO PC!");
 	}
   /* USER CODE END StartDefaultTask */
 }

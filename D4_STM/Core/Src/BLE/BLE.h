@@ -10,8 +10,6 @@
 
 #include "stm32f4xx.h"
 
-#include "stm32f4xx_hal.h"
-
 void BLE_Init(void);
 
 void BLE_SendString(const char *str);

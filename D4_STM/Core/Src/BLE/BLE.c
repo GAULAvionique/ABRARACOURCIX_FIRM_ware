@@ -6,12 +6,12 @@
  */
 
 #include "BLE.h"
-#include <string.h>
+#include "BLE/BLE_Commands.h"
+
 #include "usart.h"
 #include "stm32f4xx_it.h"
-#include "cmsis_os.h"
-#include "Motor/motor.h"
-#include <stdlib.h>
+
+#include <string.h>
 
 #define BLE_CMD_LENGTH 6
 
@@ -24,7 +24,7 @@ extern UART_HandleTypeDef huart2;
 void BLE_Init(void)
 {
     rxIndex = 0;
-    HAL_UART_Receive_IT(&huart2, &rxBuffer[rxIndex], 1); // start receiving 1 byte
+    HAL_UART_Receive_IT(&huart2, &rxBuffer[rxIndex], 1);
 }
 
 void BLE_SendString(const char *str) {
@@ -33,37 +33,6 @@ void BLE_SendString(const char *str) {
 
 void BLE_SendData(uint8_t *data, uint16_t size) {
     HAL_UART_Transmit(&huart2, data, size, HAL_MAX_DELAY);
-}
-
-void BLE_ProcessCommand(uint8_t *cmd) {
-    switch (cmd[0])
-    {
-        case 'A':
-            Motor_Init();
-            break;
-
-        case 'B':
-            Motor_Stop();
-            break;
-
-        case 'C':
-        {
-            // Convert 3 digits after 'C' to uint8_t
-            char number_string[4];
-            memcpy(number_string, &cmd[1], 3);
-            number_string[3] = '\0';
-
-            uint8_t value = (uint8_t)atoi(number_string);
-            if (value > 100) value = 100;
-
-            Motor_SetSpeed(value);
-            break;
-        }
-
-        default:
-            // Unknown command
-            break;
-    }
 }
 
 
