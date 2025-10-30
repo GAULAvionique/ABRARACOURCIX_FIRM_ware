@@ -13,6 +13,7 @@ RM := rm -rf
 -include Core/Startup/subdir.mk
 -include Core/Src/Servo/subdir.mk
 -include Core/Src/Motor/subdir.mk
+-include Core/Src/IMU/subdir.mk
 -include Core/Src/BLE/subdir.mk
 -include Core/Src/subdir.mk
 -include objects.mk
@@ -63,8 +64,8 @@ all: main-build
 main-build: D4_ABRARACOURCIX.elf secondary-outputs
 
 # Tool invocations
-D4_ABRARACOURCIX.elf D4_ABRARACOURCIX.map: $(OBJS) $(USER_OBJS) C:\Users\rempl\Documents\ABRARACOURCIX_FIRM_ware\D4_ABRARACOURCIX\STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "D4_ABRARACOURCIX.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\rempl\Documents\ABRARACOURCIX_FIRM_ware\D4_ABRARACOURCIX\STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="D4_ABRARACOURCIX.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+D4_ABRARACOURCIX.elf D4_ABRARACOURCIX.map: $(OBJS) $(USER_OBJS) /Users/felix/Developer/Design\ 4/ABRARACOURCIX_FIRM_ware/D4_ABRARACOURCIX/STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "D4_ABRARACOURCIX.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/felix/Developer/Design 4/ABRARACOURCIX_FIRM_ware/D4_ABRARACOURCIX/STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="D4_ABRARACOURCIX.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
