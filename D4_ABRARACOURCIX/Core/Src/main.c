@@ -104,30 +104,45 @@ int main(void)
 
   BLE_Init();
 
-  float angle1 = 0.048;
-  float angle2 = 0.128;
+  float angle1 = 0.085;
+  float angle2 = 0.125;
 
   int steps = 25;
 
 
   float cur_angle = angle1;
   float step_angle = (angle2 - angle1) / steps;
+
+  int time_step = 25;
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+	  /*
+	  setAllServos(angle1);
+	  HAL_Delay(1000);
+	  setAllServos(angle2);
+	  HAL_Delay(1000);
+	  */
+
+
 	  for(int i = 0; i<25; i++){
 		  cur_angle = angle1 + (i * step_angle);
 		  setAllServos(cur_angle);
-		  HAL_Delay(250);
+		  HAL_Delay(time_step);
 	  };
 
+	 HAL_Delay(3000);
+
 	  for(int i = 25; i>0; i--){
-		  cur_angle = angle2 - (i * step_angle);
+		  cur_angle = angle1 + (i * step_angle);
 		  setAllServos(cur_angle);
-		  HAL_Delay(250);
+		  HAL_Delay(time_step);
 	  };
+
+	  HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
