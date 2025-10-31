@@ -28,6 +28,7 @@
 /* USER CODE BEGIN Includes */
 #include "BLE/BLE.h"
 #include "Servo/Servo.h"
+#include "IMU/IMU.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,7 +60,14 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
+{
+    if(htim->Instance == TIM5)
+    {
+    	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
+    	regulate()
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -96,20 +104,23 @@ int main(void)
   MX_TIM3_Init();
   MX_USART2_UART_Init();
   MX_I2C1_Init();
+  MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+  HAL_TIM_Base_Start_IT(&htim5);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
+  IMU_Init();
   BLE_Init();
 
-  float angle1 = 0.048;
-  float angle2 = 0.128;
+  float angle1 = 0.078;
+  float angle2 = 0.098;
+  float angleZero = 0.088;
 
   int steps = 25;
 
@@ -121,17 +132,25 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  for(int i = 0; i<25; i++){
+
+	  IMU_Task();
+	  //setAllServos(angleZero);
+
+
+	  for(int i = 0; i<steps; i++){
 		  cur_angle = angle1 + (i * step_angle);
 		  setAllServos(cur_angle);
 		  HAL_Delay(250);
 	  };
 
-	  for(int i = 25; i>0; i--){
+
+	  for(int i = 0; i<steps; i++){
 		  cur_angle = angle2 - (i * step_angle);
 		  setAllServos(cur_angle);
 		  HAL_Delay(250);
 	  };
+
+
   }
   /* USER CODE END 3 */
 }

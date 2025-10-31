@@ -36,7 +36,7 @@ void IMU_Init(void)
 
     HAL_I2C_Master_Receive_DMA(&hi2c1 , 0x28 << 1, (uint8_t *)RX_Buffer, 1);
     HAL_Delay(1000);
-	uint8_t reg_gyro = 0x20;
+	uint8_t reg_gyro = 0x14;
 	HAL_I2C_Master_Transmit_DMA(&hi2c1 , 0x28 << 1, &reg_gyro, 1);
 	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY);
 }
@@ -46,7 +46,7 @@ void IMU_Task(void)
 	uint8_t RX_Buffer[100] = {};
 	HAL_Delay(10);
 
-	HAL_I2C_Master_Receive_DMA(&hi2c1 , 0x28 << 1, (uint8_t *)RX_Buffer, 6);
+	HAL_I2C_Master_Receive_DMA(&hi2c1 , 0x28 << 1, (uint8_t *)RX_Buffer, 8);
 
 	while(!i2c_done);
 	i2c_done = 0;

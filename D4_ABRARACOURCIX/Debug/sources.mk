@@ -23,6 +23,7 @@ C_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 Core/Src/BLE \
+Core/Src/Controller \
 Core/Src/IMU \
 Core/Src/Motor \
 Core/Src/Servo \
