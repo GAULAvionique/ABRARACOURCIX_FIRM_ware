@@ -1,7 +1,6 @@
-#include "IMU/IMU.h"
-#include "Servo/Servo.h"
-
-
+#include "../IMU/IMU.h"
+#include "../Servo/Servo.h"
+#include "Controller.h"
 
 
 const float MAX_INTEG_ERROR = 0;
@@ -9,20 +8,24 @@ const float MAX_ANGLE = 0.098;
 const float MIN_ANGLE = 0.078;
 const float dt = 100;
 
+
+float kp = 2;
+float ki = 2;
 float integralError = 0;
-
-
 
 float angSpeedX = 0;
 float angSpeedY = 0;
 float angSpeedZ = 0;
 
+float commandServo = 0;
 
-void regulate(float angSpeed){
+
+void regulate(float setPointAngSpeed){
 
 	IMU_GetGyro(&angSpeedX, &angSpeedY, &angSpeedZ);
 
-
+	commandServo = PICompute(kp, ki, angSpeedZ, setPointAngSpeed, &integralError);
+	setAllServos(commandServo);
 
 }
 
@@ -36,9 +39,14 @@ float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, floa
     if(*integralError >  MAX_INTEG_ERROR) *integralError =  MAX_INTEG_ERROR;
     if(*integralError < -MAX_INTEG_ERROR) *integralError = -MAX_INTEG_ERROR;
 
-    float cartTerm  = fminf(kp * speedError + ki * (*integralError),65535);
+    float output = kp * speedError + ki * (*integralError);
 
-    return cartTerm;
+    output = fmaxf(output, MIN_ANGLE);
+    output = fminf(output, MAX_ANGLE);
+
+    //float command  = fminf(kp * speedError + ki * (*integralError),65535);
+
+    return output;
 
 }
 

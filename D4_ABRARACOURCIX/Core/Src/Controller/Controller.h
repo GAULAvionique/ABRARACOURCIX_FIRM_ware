@@ -8,10 +8,10 @@
 #ifndef SRC_CONTROLLER_CONTROLLER_H_
 #define SRC_CONTROLLER_CONTROLLER_H_
 
-
+void regulate(float setPointAngSpeed);
 float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, float * integralError);
 
-void regulate(float angSpeed);
+
 
 
 #endif /* SRC_CONTROLLER_CONTROLLER_H_ */

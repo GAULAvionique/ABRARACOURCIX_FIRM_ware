@@ -65,7 +65,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
     if(htim->Instance == TIM5)
     {
     	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
-    	regulate()
+    	regulate();
     }
 }
 /* USER CODE END 0 */
