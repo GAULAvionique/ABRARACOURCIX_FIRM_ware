@@ -6,11 +6,11 @@
 const float MAX_INTEG_ERROR = 0;
 const float MAX_ANGLE = 0.098;
 const float MIN_ANGLE = 0.078;
-const float dt = 100;
+const float dt = 25;
 
 
-float kp = 2;
-float ki = 2;
+float kp = 0.005;
+float ki = 0.02;
 float integralError = 0;
 
 float angSpeedX = 0;

@@ -29,6 +29,7 @@
 #include "BLE/BLE.h"
 #include "Servo/Servo.h"
 #include "IMU/IMU.h"
+#include "Controller/Controller.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -65,7 +66,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
     if(htim->Instance == TIM5)
     {
     	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
-    	regulate();
+    	regulate(0.0f);
     }
 }
 /* USER CODE END 0 */
@@ -117,6 +118,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   IMU_Init();
   BLE_Init();
+  Motor_Init();
+  HAL_Delay(2000);
+  Motor_SetSpeed(25);
 
   float angle1 = 0.078;
   float angle2 = 0.098;
@@ -136,7 +140,7 @@ int main(void)
 	  IMU_Task();
 	  //setAllServos(angleZero);
 
-
+	  /*
 	  for(int i = 0; i<steps; i++){
 		  cur_angle = angle1 + (i * step_angle);
 		  setAllServos(cur_angle);
@@ -149,7 +153,7 @@ int main(void)
 		  setAllServos(cur_angle);
 		  HAL_Delay(250);
 	  };
-
+	*/
 
   }
   /* USER CODE END 3 */
