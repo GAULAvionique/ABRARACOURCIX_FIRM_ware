@@ -81,7 +81,7 @@ static void IMU_Filter(float x, float y, float z)
 {
 	if (FILTER_NUM == FILTER_IIR_LOWPASS)
 	{
-		float alpha = 0.15;
+		float alpha = 0.25;
 		gyro_z = alpha * z + (1-alpha) * gyro_z;
 	}
 	else if (FILTER_NUM == FILTER_MOVING_AVG)

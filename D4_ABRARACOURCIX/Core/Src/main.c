@@ -95,7 +95,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  uint8_t set_speed = 25;
+  uint8_t set_speed = 0;
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
