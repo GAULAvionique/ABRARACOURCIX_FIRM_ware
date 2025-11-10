@@ -515,3 +515,7 @@ D4_ABRARACOURCIX/Debug/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
 D4_ABRARACOURCIX/Debug/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
 
 D4_ABRARACOURCIX/Debug/makefile
+
+D4_ABRARACOURCIX/.settings/org.eclipse.cdt.core.prefs
+
+D4_ABRARACOURCIX/D4_ABRARACOURCIX Debug.launch

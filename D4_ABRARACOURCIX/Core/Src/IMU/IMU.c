@@ -12,6 +12,16 @@
 #include "stm32f4xx_hal_i2c.h"
 #include "i2c.h"
 
+#define FILTER_MOVING_AVG 	(1)
+#define FILTER_IIR_LOWPASS 	(2)
+#define FILTER_NUM		(FILTER_MOVING_AVG)
+#define SIZE_WINDOW 	(10)
+
+float moving_avg_data[SIZE_WINDOW] = {0.0f};
+
+float moving_avg_sum = 0.0f;
+uint8_t moving_avg_index = 0;
+
 static char CLI_BUFF[100] = {0};
 
 static float gyro_x = 0.0f;
@@ -19,6 +29,10 @@ static float gyro_y = 0.0f;
 static float gyro_z = 0.0f;
 
 uint8_t i2c_done = 0;
+
+
+
+static void IMU_Filter(float x, float y, float z);
 
 void IMU_Init(void)
 {
@@ -53,13 +67,40 @@ void IMU_Task(void)
     int16_t x = (int16_t)((RX_Buffer[1] << 8) | RX_Buffer[0]);
     int16_t y = (int16_t)((RX_Buffer[3] << 8) | RX_Buffer[2]);
     int16_t z = (int16_t)((RX_Buffer[5] << 8) | RX_Buffer[4]);
-    gyro_x = (float)x / 16.0f;
-    gyro_y = (float)y / 16.0f;
-    gyro_z = (float)z / 16.0f;
+    float gyro_x_new = (float)x / 16.0f;
+    float gyro_y_new = (float)y / 16.0f;
+    float gyro_z_new = (float)z / 16.0f;
+
+	IMU_Filter(gyro_x_new,gyro_y_new ,gyro_z_new);
+
 
 	  /* USER CODE END 2 */
 }
 
+static void IMU_Filter(float x, float y, float z)
+{
+	if (FILTER_NUM == FILTER_IIR_LOWPASS)
+	{
+		float alpha = 0.15;
+		gyro_z = alpha * z + (1-alpha) * gyro_z;
+	}
+	else if (FILTER_NUM == FILTER_MOVING_AVG)
+	{
+		moving_avg_sum += z;
+		moving_avg_sum -= moving_avg_data[moving_avg_index];
+		moving_avg_data[moving_avg_index++] = z;
+
+		moving_avg_index = (moving_avg_index == (SIZE_WINDOW))?(0):(moving_avg_index);
+		gyro_z = moving_avg_sum/SIZE_WINDOW;
+	}
+	else
+	{
+		gyro_z = z;
+	}
+
+	gyro_x = x;
+	gyro_y = y;
+}
 
 
 void IMU_GetGyro(float *x, float *y, float *z)

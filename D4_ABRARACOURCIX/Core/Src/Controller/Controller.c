@@ -1,16 +1,23 @@
 #include "../IMU/IMU.h"
 #include "../Servo/Servo.h"
 #include "Controller.h"
+#include "../BLE/BLE.h"
+#include <string.h>
+#include <stdio.h>
+#include "stm32f4xx_hal.h"
+#include <inttypes.h>
+
+const float MAX_INTEG_ERROR = 0.01;
+const float MAX_ANGLE = 0.105;
+const float MIN_ANGLE = 0.071;
+const float dt = 0.25;
 
 
-const float MAX_INTEG_ERROR = 0;
-const float MAX_ANGLE = 0.098;
-const float MIN_ANGLE = 0.078;
-const float dt = 25;
+float kp = 0.0006;
+//float ki = 0.005;
 
-
-float kp = 0.005;
-float ki = 0.02;
+//float ki = 0.0005;
+float ki = 0.00005;
 float integralError = 0;
 
 float angSpeedX = 0;
@@ -19,7 +26,10 @@ float angSpeedZ = 0;
 
 float commandServo = 0;
 
-
+char string_fix[200] ={0};
+uint8_t cx = 0;
+uint32_t prev_tick = 0;
+int32_t print_angspeed = 0;
 void regulate(float setPointAngSpeed){
 
 	IMU_GetGyro(&angSpeedX, &angSpeedY, &angSpeedZ);
@@ -39,10 +49,23 @@ float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, floa
     if(*integralError >  MAX_INTEG_ERROR) *integralError =  MAX_INTEG_ERROR;
     if(*integralError < -MAX_INTEG_ERROR) *integralError = -MAX_INTEG_ERROR;
 
+
+
+    BLE_SendData((uint8_t*)string_fix, cx);
+
+//  BLE_SendData((uint8_t*)string_fix, sizeof(string_fix));
     float output = kp * speedError + ki * (*integralError);
 
+    output = 0.088 + output;
+    float int_err = *integralError;
     output = fmaxf(output, MIN_ANGLE);
     output = fminf(output, MAX_ANGLE);
+
+    uint32_t tick = HAL_GetTick();
+
+    cx = snprintf(string_fix, sizeof(string_fix), "%f;%f;%f;%f;%f;%"PRIu32";\n\r",
+    		angSpeed, setPointAngSpeed, speedError, int_err, output, tick);
+
 
     //float command  = fminf(kp * speedError + ki * (*integralError),65535);
 

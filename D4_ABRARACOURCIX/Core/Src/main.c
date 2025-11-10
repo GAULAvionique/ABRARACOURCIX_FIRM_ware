@@ -95,7 +95,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  uint8_t set_speed = 25;
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -120,7 +120,7 @@ int main(void)
   BLE_Init();
   Motor_Init();
   HAL_Delay(2000);
-  Motor_SetSpeed(25);
+  Motor_SetSpeed(set_speed);
 
   float angle1 = 0.078;
   float angle2 = 0.098;
@@ -139,8 +139,9 @@ int main(void)
 
 	  IMU_Task();
 	  //setAllServos(angleZero);
-
+	  Motor_SetSpeed(set_speed);
 	  /*
+	   *
 	  for(int i = 0; i<steps; i++){
 		  cur_angle = angle1 + (i * step_angle);
 		  setAllServos(cur_angle);
