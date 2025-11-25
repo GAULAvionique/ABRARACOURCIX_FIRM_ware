@@ -7,6 +7,7 @@
 #include "IMU.h"
 #include <stdint.h>
 #include "stm32f4xx.h"
+#include <stdlib.h>
 #include "tim.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_i2c.h"
@@ -16,6 +17,10 @@
 #define FILTER_IIR_LOWPASS 	(2)
 #define FILTER_NUM		(FILTER_MOVING_AVG)
 #define SIZE_WINDOW 	(10)
+
+float alpha = 0.25;
+float filter_length = 20;
+uint32_t filter_id = FILTER_MOVING_AVG;
 
 float moving_avg_data[SIZE_WINDOW] = {0.0f};
 
@@ -81,7 +86,7 @@ static void IMU_Filter(float x, float y, float z)
 {
 	if (FILTER_NUM == FILTER_IIR_LOWPASS)
 	{
-		float alpha = 0.25;
+	
 		gyro_z = alpha * z + (1-alpha) * gyro_z;
 	}
 	else if (FILTER_NUM == FILTER_MOVING_AVG)
@@ -115,4 +120,21 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
     if (hi2c->Instance == I2C1) {
         i2c_done = 1; // RX finished
     }
+}
+
+
+void IMU_SetAlpha(float faggot)
+{
+	alpha = faggot;
+}
+
+
+void IMU_SetIIR_Length(uint32_t length)
+{
+	filter_length = length;
+}
+
+void IMU_SetFilter(uint32_t filt_id)
+{
+	filter_id = filt_id;
 }

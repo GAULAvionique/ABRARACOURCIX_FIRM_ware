@@ -45,6 +45,13 @@ void regulate(float setPointAngSpeed){
 }
 
 
+void Set_PID(float _kp, float _ki, float _kd)
+{
+    kp = _kp;
+    ki = _ki;
+    kd = _kd;
+}
+
 float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, float * integralError)
 {
 //	if (fabsf(angSpeed) < 5.0f) angSpeed = 0;
