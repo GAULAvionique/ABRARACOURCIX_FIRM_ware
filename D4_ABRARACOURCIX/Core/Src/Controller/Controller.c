@@ -44,7 +44,6 @@ void regulate(float setPointAngSpeed){
 
 }
 
-
 void Set_PID(float _kp, float _ki, float _kd)
 {
     kp = _kp;
@@ -67,7 +66,7 @@ float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, floa
 
     float d_input = (angSpeed - last_input);
 
-    BLE_SendData((uint8_t*)string_fix, cx);
+    //BLE_SendData((uint8_t*)string_fix, cx);
 
 //  BLE_SendData((uint8_t*)string_fix, sizeof(string_fix));
     float output = kp * speedError + ki * (*integralError) - kd*d_input;

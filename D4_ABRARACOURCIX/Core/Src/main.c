@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "dma.h"
 #include "i2c.h"
 #include "tim.h"
@@ -30,6 +31,7 @@
 #include "Servo/Servo.h"
 #include "IMU/IMU.h"
 #include "Controller/Controller.h"
+#include "BLE/BLE_Commands.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,13 +63,28 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+float setpoint = 0;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 {
     if(htim->Instance == TIM5)
     {
     	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
-    	regulate(0.0f);
+    	regulate(setpoint);
     }
+}
+
+uint8_t currentBatDataReady = 0;
+uint32_t current = 0;
+uint32_t battery = 0;
+uint32_t adcBuffer[2];
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+	if (hadc->Instance == ADC1) {
+			current = adcBuffer[0];
+			battery = adcBuffer[1];
+		currentBatDataReady = 1;
+	    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcBuffer, 2);
+	}
 }
 /* USER CODE END 0 */
 
@@ -95,7 +112,6 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  uint8_t set_speed = 0;
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -106,55 +122,34 @@ int main(void)
   MX_USART2_UART_Init();
   MX_I2C1_Init();
   MX_TIM5_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   HAL_TIM_Base_Start_IT(&htim5);
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcBuffer, 2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   IMU_Init();
   BLE_Init();
-  Motor_Init();
-  HAL_Delay(2000);
-  Motor_SetSpeed(set_speed);
 
-  float angle1 = 0.078;
-  float angle2 = 0.098;
-  float angleZero = 0.088;
-
-  int steps = 25;
-
-
-  float cur_angle = angle1;
-  float step_angle = (angle2 - angle1) / steps;
+  uint8_t uartData = 0;
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-	  IMU_Task();
-	  //setAllServos(angleZero);
-	  Motor_SetSpeed(set_speed);
-	  /*
-	   *
-	  for(int i = 0; i<steps; i++){
-		  cur_angle = angle1 + (i * step_angle);
-		  setAllServos(cur_angle);
-		  HAL_Delay(250);
-	  };
-
-
-	  for(int i = 0; i<steps; i++){
-		  cur_angle = angle2 - (i * step_angle);
-		  setAllServos(cur_angle);
-		  HAL_Delay(250);
-	  };
-	*/
+	  if(BLE_ReadData(&uartData)){
+		  BLE_ParseCommand(&uartData);
+	  }
+	  //IMU_Task();
+	  if(currentBatDataReady) {
+		  currentBatDataReady = 0;
+	  }
 
   }
   /* USER CODE END 3 */

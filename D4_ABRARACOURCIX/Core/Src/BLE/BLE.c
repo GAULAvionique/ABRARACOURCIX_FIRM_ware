@@ -13,18 +13,15 @@
 
 #include <string.h>
 
-#define BLE_CMD_LENGTH 6
 
-
-uint8_t rxBuffer[BLE_CMD_LENGTH];  // buffer for a single command
-uint8_t rxIndex = 0;               // current position in buffer
+static CircularFIFO fifo = {.head_read = 0, .head_write = 0};
+static char receivedChar;
 
 extern UART_HandleTypeDef huart2;
 
 void BLE_Init(void)
 {
-    rxIndex = 0;
-    HAL_UART_Receive_IT(&huart2, &rxBuffer[rxIndex], 1);
+    HAL_UART_Receive_IT(&huart2, (uint8_t*)&fifo.buffer[fifo.head_write], 1);
 }
 
 void BLE_SendString(const char *str) {
@@ -35,22 +32,35 @@ void BLE_SendData(uint8_t *data, uint16_t size) {
     HAL_UART_Transmit(&huart2, data, size, HAL_MAX_DELAY);
 }
 
+uint8_t BLE_ReadData(uint8_t *uartData){
+
+    if(fifo.head_read == fifo.head_write){
+        return 0;
+    }
+
+    *uartData = fifo.buffer[fifo.head_read];
+    fifo.head_read = (fifo.head_read + 1) % BUFFER_SIZE;
+    return 1;
+}
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART2)  // check your UART
-    {
-        rxIndex++;
+	if (huart->Instance == USART2) {
 
-        // If buffer full or received newline, process command
-        if (rxIndex >= 4)  // minimum command length (A/B/C + 3 digits)
-        {
-            BLE_ProcessCommand(rxBuffer);  // parse & execute
-            rxIndex = 0;                    // reset for next command
-        }
+		__disable_irq();  // disable all interrupts
 
-        // Receive next byte
-        HAL_UART_Receive_IT(&huart2, &rxBuffer[rxIndex], 1);
-    }
+		if(fifo.head_write + 1 == fifo.head_read){
+			fifo.head_read++;
+		}
+		fifo.buffer[fifo.head_write] = receivedChar;
+		fifo.head_write += 1;
+
+		if(fifo.head_write >= BUFFER_SIZE){
+			fifo.head_write = 0;
+		}
+		HAL_UART_Receive_IT(huart, (uint8_t*)&receivedChar, 1);  // Restart reception
+		__enable_irq();   // enable all interrupts
+	}
 }
+
 

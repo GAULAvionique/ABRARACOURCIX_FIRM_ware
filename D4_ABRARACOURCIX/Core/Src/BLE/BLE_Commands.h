@@ -10,6 +10,6 @@
 
 #include "stm32f4xx.h"
 
-void BLE_ProcessCommand(uint8_t *cmd);
-
+void BLE_ParseCommand(uint8_t *cmd);
+void BLE_ProcessCommand(char commandType);
 #endif /* SRC_BLE_BLE_COMMANDS_H_ */

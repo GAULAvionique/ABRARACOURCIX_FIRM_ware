@@ -15,7 +15,6 @@
 
 #define FILTER_MOVING_AVG 	(1)
 #define FILTER_IIR_LOWPASS 	(2)
-#define FILTER_NUM		(FILTER_MOVING_AVG)
 #define SIZE_WINDOW 	(10)
 
 float alpha = 0.25;
@@ -84,12 +83,12 @@ void IMU_Task(void)
 
 static void IMU_Filter(float x, float y, float z)
 {
-	if (FILTER_NUM == FILTER_IIR_LOWPASS)
+	if (filter_id == FILTER_IIR_LOWPASS)
 	{
 	
 		gyro_z = alpha * z + (1-alpha) * gyro_z;
 	}
-	else if (FILTER_NUM == FILTER_MOVING_AVG)
+	else if (filter_id == FILTER_MOVING_AVG)
 	{
 		moving_avg_sum += z;
 		moving_avg_sum -= moving_avg_data[moving_avg_index];
@@ -107,7 +106,6 @@ static void IMU_Filter(float x, float y, float z)
 	gyro_y = y;
 }
 
-
 void IMU_GetGyro(float *x, float *y, float *z)
 {
 	*x = gyro_x;
@@ -122,16 +120,14 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
     }
 }
 
-
-void IMU_SetAlpha(float faggot)
+void IMU_SetAlpha(float p_alpha)
 {
-	alpha = faggot;
+	alpha = p_alpha;
 }
 
-
-void IMU_SetIIR_Length(uint32_t length)
+void IMU_SetIIR_Length(uint32_t p_length)
 {
-	filter_length = length;
+	filter_length = p_length;
 }
 
 void IMU_SetFilter(uint32_t filt_id)

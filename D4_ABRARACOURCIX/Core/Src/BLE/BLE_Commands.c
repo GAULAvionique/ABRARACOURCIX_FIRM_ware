@@ -12,77 +12,150 @@
 #include <stdlib.h>
 #include <string.h>
 
-float ki = 0;
-float kp = 0;
-float kd = 0;
 
-void BLE_ProcessCommand(uint8_t *cmd) {
-    switch (cmd[0])
-    {
-        case 'A':
-            Motor_Init();
-            break;
+#define BUFFER_SIZE 16
 
-        case 'B':
-            Motor_Stop();
-            break;
+typedef enum {
+  Init = 0,
+  WaitInt = 1,
+  WaitFloat = 2,
+  WaitEOL = 3,
+} States;
 
-        case 'C':
-            char number_string[4];
-            memcpy(number_string, &cmd[1], 3);
-            number_string[3] = '\0';
+static float ki = 0;
+static float kp = 0;
+static float kd = 0;
 
-            uint8_t value = (uint8_t)atoi(number_string);
-            if (value > 100) value = 100;
+static States state = Init;
 
-            Motor_SetSpeed(value);
-            break;
-        
-        
-        case 'P':
-            memcpy(&kp, &cmd[1], 4);
-            Set_PID(kp, ki, kd);
-            break;
+static uint8_t dataIndex = 0;
+static uint8_t dataBuffer[BUFFER_SIZE];
 
-        case 'I':
-            memcpy(&ki, &cmd[1], 4);
-            Set_PID(kp, ki, kd);
-            break;
+static uint32_t dataInt = 0;
+static float dataFloat = 0;
 
 
-        case 'D':
-            memcpy(&kd, &cmd[1], 4);
-            Set_PID(kp, ki, kd);
-            break;
+void BLE_ParseCommand(uint8_t *cmd) {
+	dataIndex = (dataIndex + 1) % BUFFER_SIZE;
+	dataBuffer[dataIndex-1] = *cmd;
 
-        case 'E' : //alpha
-            float alpha = 0.0f; 
-            memcpy(&alpha, &cmd[1], 4);
+	switch (state) {
+		case Init:
+			switch(dataBuffer[0]) {
+				case 'A':
+				case 'B':
+					state = WaitEOL;
+					break;
+				case 'C':
+				case 'S':
+				case 'Z':
+					state = WaitInt;
+					break;
+				case 'P':
+				case 'I':
+				case 'D':
+				case 'E':
+				case 'V':
+					state = WaitFloat;
+					break;
+				default:
+					state = Init;
+					dataIndex = 0;
+					break;
+			}
+			break;
 
-            IMU_SetAlpha(alpha);
+		case WaitEOL:
+			if(dataBuffer[dataIndex-1] == '\n') {
+				BLE_ProcessCommand(dataBuffer[0]);
+			}
+			state = Init;
+			dataIndex = 0;
+			break;
 
-            break;
+		case WaitInt:
+			if(dataIndex == 5) {
+				memcpy(&dataInt, &dataBuffer[1], 4);
+				state = WaitEOL;
+			}
+			break;
 
-        case 'Z':
-
-            uint32_t filter_id = 0.0f; 
-            memcpy(&filter_id, &cmd[1], 4);
-
-            IMU_SetFilter(filter_id);
-            break;
-
-        case 'S':
-            
-            uint32_t length = 0; 
-            memcpy(&length, &cmd[1], 4);
-
-            IMU_SetIIR_Length(length);
-            break;
-
-        default:
-            break;
-    }
+		case WaitFloat:
+			if(dataIndex == 5) {
+				memcpy(&dataFloat, &dataBuffer[1], 4);
+				state = WaitEOL;
+			}
+			break;
+		default:
+			break;
+	}
 }
+
+void BLE_ProcessCommand(char commandType) {
+	switch (commandType)
+	{
+		case 'A':
+			Motor_Init();
+			break;
+
+		case 'B':
+			Motor_Stop();
+			break;
+
+		case 'C':
+			uint8_t motor_speed = dataInt;
+			if (motor_speed > 100) {
+				motor_speed = 100;
+			}
+
+			Motor_SetSpeed(motor_speed);
+			break;
+
+
+		case 'P':
+			kp = dataFloat;
+			Set_PID(kp, ki, kd);
+			break;
+
+		case 'I':
+			ki = dataFloat;
+			Set_PID(kp, ki, kd);
+			break;
+
+
+		case 'D':
+			kd = dataFloat;
+			Set_PID(kp, ki, kd);
+			break;
+
+		case 'E' :
+			float alpha = dataFloat;
+			IMU_SetAlpha(alpha);
+			break;
+
+		case 'Z':
+
+			uint32_t filter_id = dataInt;
+			IMU_SetFilter(filter_id);
+			break;
+
+		case 'S':
+
+			uint32_t length = dataInt;
+			IMU_SetIIR_Length(length);
+			break;
+
+		case 'V':
+
+			setpoint = dataFloat;
+
+			break;
+
+		default:
+			break;
+	}
+}
+
 
 
 
