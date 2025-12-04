@@ -1,5 +1,6 @@
 "./Core/Src/BLE/BLE.o"
 "./Core/Src/BLE/BLE_Commands.o"
+"./Core/Src/BLE/BLE_tx.o"
 "./Core/Src/Controller/Controller.o"
 "./Core/Src/IMU/IMU.o"
 "./Core/Src/Motor/motor.o"

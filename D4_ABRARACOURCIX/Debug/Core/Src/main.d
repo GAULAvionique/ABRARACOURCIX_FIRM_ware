@@ -35,7 +35,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/dma.h ../Core/Inc/i2c.h \
  ../Core/Inc/tim.h ../Core/Inc/usart.h ../Core/Inc/gpio.h \
  ../Core/Src/BLE/BLE.h ../Core/Src/Servo/Servo.h ../Core/Src/IMU/IMU.h \
- ../Core/Src/Controller/Controller.h ../Core/Src/BLE/BLE_Commands.h
+ ../Core/Src/Controller/Controller.h ../Core/Src/BLE/BLE_Commands.h \
+ ../Core/Src/BLE/BLE_tx.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -82,3 +83,4 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Src/IMU/IMU.h:
 ../Core/Src/Controller/Controller.h:
 ../Core/Src/BLE/BLE_Commands.h:
+../Core/Src/BLE/BLE_tx.h:

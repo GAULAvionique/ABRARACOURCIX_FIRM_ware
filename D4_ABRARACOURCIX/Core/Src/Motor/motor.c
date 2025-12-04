@@ -8,6 +8,7 @@
 #include "stm32f4xx.h"
 #include "tim.h"
 #include "motor.h"
+#include "../Controller/Controller.h"
 
 #define MINIMUM_THROTLE_PULSE 1000 //us
 #define MAXIMUM_THROTLE_PULSE 2000 //us
@@ -26,7 +27,7 @@ void Motor_Init(void) {
 void Motor_SetSpeed(uint8_t p_duty_cycle) {
     if (p_duty_cycle < 0) p_duty_cycle = 0;
     if (p_duty_cycle > 100) p_duty_cycle = 100;
-
+    Set_motor_speed(p_duty_cycle);
     uint16_t pulse_width_us = MINIMUM_THROTLE_PULSE + ((uint32_t)p_duty_cycle * MINIMUM_THROTLE_PULSE) / 100;
 
     // Set initial pulse width (1 ms = 1000 ticks)

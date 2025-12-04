@@ -134,3 +134,7 @@ void IMU_SetFilter(uint32_t filt_id)
 {
 	filter_id = filt_id;
 }
+
+uint32_t get_filter_type(){
+	return filter_id;
+}

@@ -18,4 +18,5 @@ void IMU_GetGyro(float *x, float *y, float *z);
 void IMU_SetAlpha(float faggot);
 void IMU_SetIIR_Length(uint32_t length);
 void IMU_SetFilter(uint32_t filt_id);
+uint32_t get_filter_type();
 #endif /* SRC_IMU_IMU_H_ */

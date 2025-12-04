@@ -32,6 +32,7 @@
 #include "IMU/IMU.h"
 #include "Controller/Controller.h"
 #include "BLE/BLE_Commands.h"
+#include "BLE/BLE_tx.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,6 +53,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+static int8_t ready_to_send_data = 0;
+
 
 /* USER CODE END PV */
 
@@ -64,15 +67,19 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 float setpoint = 0;
+
+// FONCTION APPELÉE À TOUS LES 25 MS.
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 {
     if(htim->Instance == TIM5)
     {
     	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
     	regulate(setpoint);
+    	ready_to_send_data = 1;
     }
 }
 
+// FONCTION POUR LIRE ADC
 uint8_t currentBatDataReady = 0;
 uint32_t current = 0;
 uint32_t battery = 0;
@@ -86,6 +93,50 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 	    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcBuffer, 2);
 	}
 }
+
+
+// FONCTION POUR METTRE À JOUR LE DISPLAY DATA
+
+static int angular_speed = -50.0;
+static float cmd_servo = 0.0;
+static float bat_current = 0.0;
+static float bat_voltage = 0.0;
+static float error = 0.0;
+static float int_error = 0.0;
+static float P = 0.0;
+static float I = 0.0;
+static float D = 0.0;
+static int time_tick = 0;
+static int filter_type = 0;
+
+void update_disp_variables(){
+	angular_speed = get_ang_speed();
+	cmd_servo = get_cmd_servo();
+	//bat_current = get_bat_current();
+	//bat_voltage = get_bat_voltage();
+	error = get_error();
+	int_error = get_int_error();
+	P = get_P();
+	I = get_I();
+	D = get_D();
+	time_tick = HAL_GetTick();
+	filter_type = get_filter_type();
+}
+
+void disp_variables(){
+	send_float_package('S', angular_speed);
+	send_float_package('C', cmd_servo);
+	//bat I
+	//bat V
+	send_float_package('E', error);
+	send_float_package('N', int_error);
+	send_float_package('P', P);
+	send_float_package('I', I);
+	send_float_package('D', D);
+	send_uint32_t_package('T', time_tick);
+	send_uint32_t_package('F', filter_type);
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -134,7 +185,8 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  IMU_Init();
+
+  //IMU_Init();
   BLE_Init();
 
   uint8_t uartData = 0;
@@ -151,6 +203,20 @@ int main(void)
 		  currentBatDataReady = 0;
 	  }
 
+	  if(ready_to_send_data){
+		  // Send vitesse
+		  // Send cmd servo
+		  // Send error
+		  // Send integral errorbuffer
+		  //
+		  update_disp_variables();
+		  disp_variables();
+
+		  //send_float_package('Y',(float)angular_speed);
+		  //send_float_package('B',angular_speed);
+		  //send_uint32_t_package('B',HAL_GetTick());
+		  ready_to_send_data = 0;
+	  }
   }
   /* USER CODE END 3 */
 }
