@@ -108,7 +108,7 @@ void BLE_ProcessCommand(char commandType) {
 				motor_speed = 100;
 			}
 
-			Motor_SetSpeed(motor_speed);
+			Motor_RampSpeed(motor_speed);
 			break;
 
 

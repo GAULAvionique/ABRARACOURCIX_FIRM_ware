@@ -80,20 +80,27 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 }
 
 // FONCTION POUR LIRE ADC
-uint8_t currentBatDataReady = 0;
-uint32_t current = 0;
-uint32_t battery = 0;
-uint32_t adcBuffer[2];
+static uint32_t current = 0;
+static uint32_t battery = 0;
+static uint32_t adcBuffer[2];
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 	if (hadc->Instance == ADC1) {
 			current = adcBuffer[0];
 			battery = adcBuffer[1];
-		currentBatDataReady = 1;
 	    HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcBuffer, 2);
 	}
 }
+float get_bat_current()
+{
+	return (float)current; //(float)current * 15.0 * 3.3 / 4096.0;
+}
 
+
+float get_bat_voltage()
+{
+	return (float)battery; //100.0 * (float)battery / 4096.0;
+}
 
 // FONCTION POUR METTRE À JOUR LE DISPLAY DATA
 
@@ -112,8 +119,6 @@ static int filter_type = 0;
 void update_disp_variables(){
 	angular_speed = get_ang_speed();
 	cmd_servo = get_cmd_servo();
-	//bat_current = get_bat_current();
-	//bat_voltage = get_bat_voltage();
 	error = get_error();
 	int_error = get_int_error();
 	P = get_P();
@@ -121,13 +126,15 @@ void update_disp_variables(){
 	D = get_D();
 	time_tick = HAL_GetTick();
 	filter_type = get_filter_type();
+	bat_current = get_bat_current();
+	bat_voltage = get_bat_voltage();
 }
 
 void disp_variables(){
 	send_float_package('S', angular_speed);
 	send_float_package('C', cmd_servo);
-	//bat I
-	//bat V
+	send_float_package('A', bat_current);
+	send_float_package('B', bat_voltage);
 	send_float_package('E', error);
 	send_float_package('N', int_error);
 	send_float_package('P', P);
@@ -186,7 +193,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  //IMU_Init();
+  IMU_Init();
   BLE_Init();
 
   uint8_t uartData = 0;
@@ -198,10 +205,7 @@ int main(void)
 	  if(BLE_ReadData(&uartData)){
 		  BLE_ParseCommand(&uartData);
 	  }
-	  //IMU_Task();
-	  if(currentBatDataReady) {
-		  currentBatDataReady = 0;
-	  }
+	  IMU_Task();
 
 	  if(ready_to_send_data){
 		  // Send vitesse

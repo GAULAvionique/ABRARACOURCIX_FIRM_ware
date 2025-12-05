@@ -63,7 +63,7 @@ void Set_motor_speed(uint8_t new_motor_speed){
 	motor_speed = new_motor_speed;
 	// SI on a pas envoyé de nouveau param, utilisé par defaut programmé
 	if(!use_updated_pid){
-		programmed_gains();
+		//programmed_gains();
 	}
 }
 

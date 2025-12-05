@@ -62,7 +62,7 @@ void IMU_Init(void)
 void IMU_Task(void)
 {
 	uint8_t RX_Buffer[100] = {};
-	HAL_Delay(10);
+	//HAL_Delay(10);
 
 	HAL_I2C_Master_Receive_DMA(&hi2c1 , 0x28 << 1, (uint8_t *)RX_Buffer, 8);
 
