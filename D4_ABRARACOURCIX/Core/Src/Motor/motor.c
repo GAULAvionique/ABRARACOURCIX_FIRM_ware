@@ -54,7 +54,7 @@ void Motor_RampSpeed(uint8_t p_duty_cycle){
 			break;
 		}
 		Motor_SetSpeed((uint8_t)i);
-		HAL_Delay(10);
+		HAL_Delay(20);
 	}
 
 }
@@ -66,7 +66,7 @@ void Motor_Stop(void) {
 	{
 		if (i < 0){i = 0;}
 		Motor_SetSpeed((uint8_t)i);
-		HAL_Delay(10);
+		HAL_Delay(20);
 	}
     // Set PWM to minimum throttle
 	HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_1);
