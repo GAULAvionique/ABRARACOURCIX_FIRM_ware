@@ -56,6 +56,7 @@ void BLE_ParseCommand(uint8_t *cmd) {
 				case 'D':
 				case 'E':
 				case 'V':
+				case 'F':
 					state = WaitFloat;
 					break;
 				default:
@@ -149,6 +150,11 @@ void BLE_ProcessCommand(char commandType) {
 
 			setpoint = dataFloat;
 
+			break;
+
+		case 'F':
+			float servoCommand = dataFloat;
+			setAllServos(servoCommand);
 			break;
 
 		default:

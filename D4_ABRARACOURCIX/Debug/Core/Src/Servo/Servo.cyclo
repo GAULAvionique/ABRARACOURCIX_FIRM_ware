@@ -1,2 +1,3 @@
 ../Core/Src/Servo/Servo.c:11:6:setServoDuty	7
 ../Core/Src/Servo/Servo.c:47:6:setAllServos	1
+../Core/Src/Servo/Servo.c:54:6:setServosSep	1

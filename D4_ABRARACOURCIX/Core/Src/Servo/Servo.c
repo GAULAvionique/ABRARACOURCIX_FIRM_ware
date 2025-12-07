@@ -51,3 +51,12 @@ void setAllServos(float dutyCycle){
 	  setServoDuty(4, dutyCycle);
 }
 
+void setServosSep(float dutyCycle1, float dutyCycle2, float dutyCycle3, float dutyCycle4){
+
+
+	  setServoDuty(1, dutyCycle1);
+	  setServoDuty(2, dutyCycle2);
+	  setServoDuty(3, dutyCycle3);
+	  setServoDuty(4, dutyCycle4);
+}
+

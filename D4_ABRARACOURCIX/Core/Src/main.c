@@ -94,8 +94,8 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 float get_bat_current()
 {
 	//        tension lue par ADC * ratio de résistances * ratio de l'ADC
-	current = (float)current * 3 / 2 * 3.3 / 4096.0;
-	return (current - 2.5)*10;
+float	current_conv = (float)current * 3.0 / 2.0 * 3.3 / 4096.0;
+	return (current_conv - 2.5)*10.0;
 }
 
 
@@ -104,9 +104,9 @@ float get_bat_voltage()
 	//return 100.0 * (float)battery / 4096.0;
 
 	//tension lue par l'ADC sur 4096 * ratio de l'ADC 12 bits
-	battery = (float)battery * 3.3 / 4096.0;
+float	battery_conv = (float)battery * 3.3 / 4096.0;
 // 3 = gain ampli diff - référence de tension / diviseur de tension
-	return  ((battery/3)+2.46)/0.2;
+	return  ((battery_conv/3.0)+2.46)/0.2;
 }
 
 // FONCTION POUR METTRE À JOUR LE DISPLAY DATA
