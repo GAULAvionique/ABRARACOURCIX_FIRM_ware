@@ -10,8 +10,8 @@
 
 #define PROGRAMMED_GAINS_LEN 4
 
-const float MAX_INTEG_ERROR = 25.0;
-const float MIN_INTEG_ERROR = -25.0;
+const float MAX_INTEG_ERROR = 40.0;
+const float MIN_INTEG_ERROR = -40.0;
 const float MAX_ANGLE = 100.0;
 const float MIN_ANGLE = 0.0;
 const float dt = 0.1;
