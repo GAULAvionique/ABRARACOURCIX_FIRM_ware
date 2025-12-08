@@ -9,6 +9,7 @@
 #include "../Motor/motor.h"
 #include "../Controller/Controller.h"
 #include "../IMU/IMU.h"
+#include "../Servo/Servo.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -49,6 +50,7 @@ void BLE_ParseCommand(uint8_t *cmd) {
 				case 'C':
 				case 'S':
 				case 'Z':
+				case 'G':
 					state = WaitInt;
 					break;
 				case 'P':
@@ -57,6 +59,12 @@ void BLE_ParseCommand(uint8_t *cmd) {
 				case 'E':
 				case 'V':
 				case 'F':
+				case 'a':
+				case 'b':
+				case 'c':
+				case 'd':
+				case 'e':
+				case 'f':
 					state = WaitFloat;
 					break;
 				default:
@@ -157,6 +165,40 @@ void BLE_ProcessCommand(char commandType) {
 			setAllServos(servoCommand);
 			break;
 
+		case 'G':
+			uint32_t is_regulate = dataInt;
+			set_Regulate(is_regulate);
+			break;
+
+		case 'a':
+			float servo_offset1 = dataFloat;
+			set_offset(1, servo_offset1);
+			break;
+
+		case 'b':
+			float servo_offset2 = dataFloat;
+			set_offset(2, servo_offset2);
+			break;
+
+		case 'c':
+			float servo_offset3 = dataFloat;
+			set_offset(3, servo_offset3);
+
+			break;
+
+		case 'd':
+			float servo_offset4 = dataFloat;
+			set_offset(4, servo_offset4);
+			break;
+		case 'e':
+			float min_range = dataFloat;
+			set_min_range(min_range);
+			break;
+
+		case 'f':
+			float max_range = dataFloat;
+			set_max_range(max_range);
+			break;
 		default:
 			break;
 	}

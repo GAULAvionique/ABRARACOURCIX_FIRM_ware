@@ -15,6 +15,8 @@ void Set_Setpoint(float sp);
 void Set_motor_speed(uint8_t new_motor_speed);
 void programmed_gains();
 
+void set_Regulate(uint32_t set_regulate);
+
 float get_ang_speed();
 float get_cmd_servo();
 float get_error();
@@ -22,6 +24,7 @@ float get_int_error();
 float get_P();
 float get_I();
 float get_D();
+float get_setpoint();
 
 extern float setpoint;
 

@@ -1,3 +1,9 @@
-../Core/Src/Servo/Servo.c:11:6:setServoDuty	7
-../Core/Src/Servo/Servo.c:47:6:setAllServos	1
-../Core/Src/Servo/Servo.c:54:6:setServosSep	1
+../Core/Src/Servo/Servo.c:24:6:setServoDuty	9
+../Core/Src/Servo/Servo.c:73:6:setAllServos	1
+../Core/Src/Servo/Servo.c:81:6:setServosSep	1
+../Core/Src/Servo/Servo.c:90:6:set_offset	5
+../Core/Src/Servo/Servo.c:119:6:set_min_range	1
+../Core/Src/Servo/Servo.c:124:6:set_max_range	1
+../Core/Src/Servo/Servo.c:129:6:update_mid_point	1
+../Core/Src/Servo/Servo.c:134:6:init_offset	1
+../Core/Src/Servo/Servo.c:141:7:get_duty_cycle	1

@@ -20,6 +20,7 @@ static uint16_t cxf = 0;
 
 
 void send_uint32_t_package(char header, uint32_t value){
+	memset(buffer, 0, sizeof buffer);
 	buffer[0] = header;
 	cxi = snprintf(buffer + SIZE_OF_CHAR, sizeof(buffer) - SIZE_OF_CHAR, "%"PRIu32";\n", value);
 	BLE_SendData((uint8_t*)buffer, cxi+SIZE_OF_CHAR);
@@ -29,6 +30,7 @@ void send_uint32_t_package(char header, uint32_t value){
 
 
 void send_float_package(char header, float value){
+	memset(buffer, 0, sizeof buffer);
 	buffer[0] = header;
 	cxf = snprintf(buffer + SIZE_OF_CHAR, sizeof(buffer) - SIZE_OF_CHAR, "%f;\n", value);
 	BLE_SendData((uint8_t*)buffer, cxf+SIZE_OF_CHAR);

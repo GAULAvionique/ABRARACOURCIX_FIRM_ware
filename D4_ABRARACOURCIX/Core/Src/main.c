@@ -53,7 +53,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-static int8_t ready_to_send_data = 0;
 
 
 /* USER CODE END PV */
@@ -69,15 +68,7 @@ void SystemClock_Config(void);
 float setpoint = 0;
 
 // FONCTION APPELÉE À TOUS LES 25 MS.
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
-{
-    if(htim->Instance == TIM5)
-    {
-    	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
-    	regulate(setpoint);
-    	ready_to_send_data = 1;
-    }
-}
+
 
 // FONCTION POUR LIRE ADC
 static uint32_t current = 0;
@@ -111,9 +102,10 @@ float	battery_conv = (float)battery * 3.3 / 4096.0;
 
 // FONCTION POUR METTRE À JOUR LE DISPLAY DATA
 
-static int angular_speed = -50.0;
+static int angular_speed = 0.0;
 static float cmd_servo = 0.0;
 static float bat_current = 0.0;
+static float current_set_point = 0.0;
 static float bat_voltage = 0.0;
 static float error = 0.0;
 static float int_error = 0.0;
@@ -122,10 +114,13 @@ static float I = 0.0;
 static float D = 0.0;
 static int time_tick = 0;
 static int filter_type = 0;
+static float m_duty_cycle = 0.0;
+
 
 void update_disp_variables(){
 	angular_speed = get_ang_speed();
 	cmd_servo = get_cmd_servo();
+	current_set_point = get_setpoint();
 	error = get_error();
 	int_error = get_int_error();
 	P = get_P();
@@ -135,11 +130,14 @@ void update_disp_variables(){
 	filter_type = get_filter_type();
 	bat_current = get_bat_current();
 	bat_voltage = get_bat_voltage();
+	m_duty_cycle = get_duty_cycle();
 }
 
 void disp_variables(){
+
 	send_float_package('S', angular_speed);
 	send_float_package('C', cmd_servo);
+	send_float_package('K', current_set_point);
 	send_float_package('A', bat_current);
 	send_float_package('B', bat_voltage);
 	send_float_package('E', error);
@@ -147,8 +145,23 @@ void disp_variables(){
 	send_float_package('P', P);
 	send_float_package('I', I);
 	send_float_package('D', D);
+	send_float_package('L', m_duty_cycle);
 	send_uint32_t_package('T', time_tick);
 	send_uint32_t_package('F', filter_type);
+
+}
+
+
+static int ready_to_send = 0;
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
+{
+    if(htim->Instance == TIM5)
+    {
+    	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_1);
+    	regulate(setpoint);
+    	ready_to_send = 1;
+
+    }
 }
 
 /* USER CODE END 0 */
@@ -195,6 +208,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   HAL_TIM_Base_Start_IT(&htim5);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcBuffer, 2);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -202,8 +216,11 @@ int main(void)
 
   IMU_Init();
   BLE_Init();
+  init_offset();
 
   uint8_t uartData = 0;
+  uint32_t start_time = HAL_GetTick();
+  uint32_t delta_time = 100;
   while (1)
   {
     /* USER CODE END WHILE */
@@ -212,21 +229,17 @@ int main(void)
 	  if(BLE_ReadData(&uartData)){
 		  BLE_ParseCommand(&uartData);
 	  }
+
 	  IMU_Task();
 
-	  if(ready_to_send_data){
-		  // Send vitesse
-		  // Send cmd servo
-		  // Send error
-		  // Send integral errorbuffer
-		  //
+	  //if(HAL_GetTick() - start_time >= delta_time){
+	  if(ready_to_send){
 		  update_disp_variables();
 		  disp_variables();
 
-		  //send_float_package('Y',(float)angular_speed);
-		  //send_float_package('B',angular_speed);
-		  //send_uint32_t_package('B',HAL_GetTick());
-		  ready_to_send_data = 0;
+		  start_time = HAL_GetTick();
+		  ready_to_send = 0;
+
 	  }
   }
   /* USER CODE END 3 */

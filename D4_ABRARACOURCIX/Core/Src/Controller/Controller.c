@@ -10,11 +10,13 @@
 
 #define PROGRAMMED_GAINS_LEN 4
 
-const float MAX_INTEG_ERROR = 0.04;
-const float MAX_ANGLE = 0.105;
-const float MIN_ANGLE = 0.071;
-const float dt = 0.025;
+const float MAX_INTEG_ERROR = 25.0;
+const float MIN_INTEG_ERROR = -25.0;
+const float MAX_ANGLE = 100.0;
+const float MIN_ANGLE = 0.0;
+const float dt = 0.1;
 
+static uint32_t is_regulating = 1;
 
 static float speedError;
 static float d_input;
@@ -26,28 +28,29 @@ static uint8_t motor_speed = 0.0;
 static float programmed_gains_P[PROGRAMMED_GAINS_LEN] = {0.0, 0.1, 0.3, 0.4};
 
 static float kp = 0.0003;
-static float kd = 0.0003;
+static float kd = 0.0000;
 static float ki = 0.0001;
 
-float integralError = 0;
+float integralError = 0.0;
 
-float angSpeedX = 0;
-float angSpeedY = 0;
-float angSpeedZ = 0;
+float angSpeedX = 0.0;
+float angSpeedY = 0.0;
+float angSpeedZ = 0.0;
 
-float commandServo = 0;
-float last_input = 0.0f;
+static float commandServo = 0.0;
+static float last_input = 0.0f;
 
-char string_fix[200] ={0};
-uint8_t cx = 0;
-uint32_t prev_tick = 0;
-int32_t print_angspeed = 0;
+static float cur_set_point = 0.0;
+
 void regulate(float setPointAngSpeed){
 
-	IMU_GetGyro(&angSpeedX, &angSpeedY, &angSpeedZ);
+	cur_set_point = setPointAngSpeed;
 
-	commandServo = PICompute(kp, ki, angSpeedZ, setPointAngSpeed, &integralError);
-	setAllServos(commandServo);
+	IMU_GetGyro(&angSpeedX, &angSpeedY, &angSpeedZ);
+	if(is_regulating){
+		commandServo = PICompute(kp, ki, angSpeedZ, setPointAngSpeed, &integralError);
+		setAllServos(commandServo);
+	}
 
 }
 
@@ -87,31 +90,32 @@ void programmed_gains(){
 	return;
 }
 
+void set_Regulate(uint32_t set_regulate){
+	is_regulating = set_regulate;
+}
+
 float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, float * integralError)
 {
-//	if (fabsf(angSpeed) < 5.0f) angSpeed = 0;
+
+
     speedError = (setPointAngSpeed - angSpeed);
     *integralError += speedError * dt;
 
-
-
-
     // Clamp integrator
     if(*integralError >  MAX_INTEG_ERROR) *integralError =  MAX_INTEG_ERROR;
-    if(*integralError < -MAX_INTEG_ERROR) *integralError = -MAX_INTEG_ERROR;
+    if(*integralError < MIN_INTEG_ERROR) *integralError = MIN_INTEG_ERROR;
 
     d_input = (angSpeed - last_input);
 
     output = kp * speedError + ki * (*integralError) - kd*d_input;
 
-    output = 0.088 + output;
+
     int_err = *integralError;
+
     output = fmaxf(output, MIN_ANGLE);
     output = fminf(output, MAX_ANGLE);
 
-
     last_input = angSpeed;
-    //float command  = fminf(kp * speedError + ki * (*integralError),65535);
 
     return output;
 }
@@ -146,5 +150,8 @@ float get_D(){
 	return kd;
 }
 
+float get_setpoint(){
+	return cur_set_point;
+}
 
 
