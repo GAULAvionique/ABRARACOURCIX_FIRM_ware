@@ -126,6 +126,15 @@ void set_max_range(float p_max_range){
 	update_mid_point();
 }
 
+void update_range(float p_range){
+	p_range = p_range / 100.0;
+	float half_range = p_range / 2.0;
+	min_range = true_mid - half_range;
+	max_range = true_mid + half_range;
+	update_mid_point();
+
+}
+
 void update_mid_point(){
 	true_mid = min_range + ((max_range - min_range) / 2.0);
 	init_offset();

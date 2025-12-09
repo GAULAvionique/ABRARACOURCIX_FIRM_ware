@@ -4,6 +4,7 @@
 ../Core/Src/Servo/Servo.c:90:6:set_offset	5
 ../Core/Src/Servo/Servo.c:119:6:set_min_range	1
 ../Core/Src/Servo/Servo.c:124:6:set_max_range	1
-../Core/Src/Servo/Servo.c:129:6:update_mid_point	1
-../Core/Src/Servo/Servo.c:135:6:init_offset	1
-../Core/Src/Servo/Servo.c:142:7:get_duty_cycle	1
+../Core/Src/Servo/Servo.c:129:6:update_range	1
+../Core/Src/Servo/Servo.c:138:6:update_mid_point	1
+../Core/Src/Servo/Servo.c:144:6:init_offset	1
+../Core/Src/Servo/Servo.c:151:7:get_duty_cycle	1

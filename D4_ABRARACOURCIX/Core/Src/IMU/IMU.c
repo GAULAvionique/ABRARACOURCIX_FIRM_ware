@@ -26,14 +26,12 @@ float moving_avg_data[SIZE_WINDOW] = {0.0f};
 float moving_avg_sum = 0.0f;
 uint8_t moving_avg_index = 0;
 
-static char CLI_BUFF[100] = {0};
-
 static float gyro_x = 0.0f;
 static float gyro_y = 0.0f;
 static float gyro_z = 0.0f;
 
 uint8_t i2c_done = 0;
-
+static uint8_t RX_Buffer[100] = {};
 
 
 static void IMU_Filter(float x, float y, float z);
@@ -59,26 +57,11 @@ void IMU_Init(void)
 	while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY);
 }
 
+
 void IMU_Task(void)
 {
-	uint8_t RX_Buffer[100] = {};
-	//HAL_Delay(10);
-
-	HAL_I2C_Master_Receive_DMA(&hi2c1 , 0x28 << 1, (uint8_t *)RX_Buffer, 8);
-
-	while(!i2c_done);
-	i2c_done = 0;
-    int16_t x = (int16_t)((RX_Buffer[1] << 8) | RX_Buffer[0]);
-    int16_t y = (int16_t)((RX_Buffer[3] << 8) | RX_Buffer[2]);
-    int16_t z = (int16_t)((RX_Buffer[5] << 8) | RX_Buffer[4]);
-    float gyro_x_new = (float)x / 16.0f;
-    float gyro_y_new = (float)y / 16.0f;
-    float gyro_z_new = (float)z / 16.0f;
-
-	IMU_Filter(gyro_x_new,gyro_y_new ,gyro_z_new);
-
-
-	  /* USER CODE END 2 */
+	uint8_t reg_gyro = 0x14;
+	HAL_I2C_Master_Transmit_DMA(&hi2c1 , 0x28 << 1, &reg_gyro, 1);
 }
 
 static void IMU_Filter(float x, float y, float z)
@@ -113,12 +96,24 @@ void IMU_GetGyro(float *x, float *y, float *z)
 	*z = gyro_z;
 }
 
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
-{
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c) {
+    HAL_I2C_Master_Receive_DMA(hi2c , 0x28 << 1, (uint8_t *)RX_Buffer, 8);
+}
+
+
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c) {
     if (hi2c->Instance == I2C1) {
-        i2c_done = 1; // RX finished
+		int16_t x = (int16_t)((RX_Buffer[1] << 8) | RX_Buffer[0]);
+		int16_t y = (int16_t)((RX_Buffer[3] << 8) | RX_Buffer[2]);
+		int16_t z = (int16_t)((RX_Buffer[5] << 8) | RX_Buffer[4]);
+		float gyro_x_new = (float)x / 16.0f;
+		float gyro_y_new = (float)y / 16.0f;
+		float gyro_z_new = (float)z / 16.0f;
+
+		IMU_Filter(gyro_x_new,gyro_y_new ,gyro_z_new);
     }
 }
+
 
 void IMU_SetAlpha(float p_alpha)
 {

@@ -64,7 +64,6 @@ void BLE_ParseCommand(uint8_t *cmd) {
 				case 'c':
 				case 'd':
 				case 'e':
-				case 'f':
 					state = WaitFloat;
 					break;
 				default:
@@ -191,14 +190,10 @@ void BLE_ProcessCommand(char commandType) {
 			set_offset(4, servo_offset4);
 			break;
 		case 'e':
-			float min_range = dataFloat;
-			set_min_range(min_range);
+			float range = dataFloat;
+			update_range(range);
 			break;
 
-		case 'f':
-			float max_range = dataFloat;
-			set_max_range(max_range);
-			break;
 		default:
 			break;
 	}

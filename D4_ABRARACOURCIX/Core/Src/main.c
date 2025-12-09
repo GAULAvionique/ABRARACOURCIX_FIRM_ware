@@ -119,7 +119,6 @@ static float m_duty_cycle = 0.0;
 
 void update_disp_variables(){
 	angular_speed = get_ang_speed();
-	cmd_servo = get_cmd_servo();
 	current_set_point = get_setpoint();
 	error = get_error();
 	int_error = get_int_error();
@@ -127,7 +126,6 @@ void update_disp_variables(){
 	I = get_I();
 	D = get_D();
 	time_tick = HAL_GetTick();
-	filter_type = get_filter_type();
 	bat_current = get_bat_current();
 	bat_voltage = get_bat_voltage();
 	m_duty_cycle = get_duty_cycle();
@@ -136,9 +134,9 @@ void update_disp_variables(){
 void disp_variables(){
 
 	send_float_package('S', angular_speed);
-	send_float_package('C', cmd_servo);
 	send_float_package('K', current_set_point);
 	send_float_package('A', bat_current);
+	send_uint32_t_package('T', time_tick);
 	send_float_package('B', bat_voltage);
 	send_float_package('E', error);
 	send_float_package('N', int_error);
@@ -146,8 +144,6 @@ void disp_variables(){
 	send_float_package('I', I);
 	send_float_package('D', D);
 	send_float_package('L', m_duty_cycle);
-	send_uint32_t_package('T', time_tick);
-	send_uint32_t_package('F', filter_type);
 
 }
 
@@ -219,8 +215,6 @@ int main(void)
   init_offset();
 
   uint8_t uartData = 0;
-  uint32_t start_time = HAL_GetTick();
-  uint32_t delta_time = 100;
   while (1)
   {
     /* USER CODE END WHILE */
@@ -237,7 +231,6 @@ int main(void)
 		  update_disp_variables();
 		  disp_variables();
 
-		  start_time = HAL_GetTick();
 		  ready_to_send = 0;
 
 	  }
