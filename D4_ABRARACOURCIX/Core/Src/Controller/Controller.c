@@ -38,11 +38,23 @@ float angSpeedY = 0.0;
 float angSpeedZ = 0.0;
 
 static float commandServo = 0.0;
-static float last_input = 0.0f;
+static float last_input = 0.0;
 
 static float cur_set_point = 0.0;
 
 static float scaling_factor = 1.0;
+
+
+#define MAX_SIZE_WINDOW 	(20)
+static float moving_avg_data[MAX_SIZE_WINDOW] = {0.0f};
+static float moving_avg_sum = 0.0;
+static uint8_t moving_avg_index = 0;
+static uint8_t size_window = 0;
+static float commandServoFilter = 0.0;
+
+uint8_t setpoint_changed = 0;
+float previous_setpoint = 0;
+
 
 void regulate(float setPointAngSpeed){
 
@@ -51,8 +63,27 @@ void regulate(float setPointAngSpeed){
 	IMU_GetGyro(&angSpeedX, &angSpeedY, &angSpeedZ);
 	if(is_regulating){
 
+
+		if(setpoint_changed) {
+			if(previous_setpoint > cur_set_point) {
+				if(angSpeedZ < cur_set_point) {
+					integralError = 0.0;
+					setpoint_changed = 0;
+				}
+			}
+			/*else {
+				if(angSpeedZ > cur_set_point) {
+					integralError = 0.0;
+					setpoint_changed = 0;
+				}
+			}*/
+		}
+
 		commandServo = PICompute(kp, ki, angSpeedZ, setPointAngSpeed, &integralError);
-		setAllServos(commandServo);
+		commandServoFilter = ServoFilter(commandServo, 10);
+
+		setAllServos(commandServoFilter);
+		//setAllServos(commandServo);
 
 	}
 
@@ -128,7 +159,25 @@ float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, floa
     return output * scaling_factor;
 }
 
+float ServoFilter(float PID_Output, float motor_intensity)
+{
+		size_window = 3;
 
+		moving_avg_sum += PID_Output;
+		moving_avg_sum -= moving_avg_data[moving_avg_index];
+		moving_avg_data[moving_avg_index++] = PID_Output;
+
+		moving_avg_index = (moving_avg_index == (size_window))?(0):(moving_avg_index);
+
+		return moving_avg_sum/size_window;
+	}
+
+
+void setSetpoint(float p_setpoint) {
+	previous_setpoint = setpoint;
+	setpoint = p_setpoint;
+	setpoint_changed = 1;
+}
 
 float get_ang_speed(){
 	return angSpeedZ;

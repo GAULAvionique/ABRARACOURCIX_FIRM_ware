@@ -119,6 +119,7 @@ void BLE_ProcessCommand(char commandType) {
 
 			Motor_RampSpeed(motor_speed);
 			set_motor_intensity(motor_speed);
+			compute_operating_range(motor_speed);
 			break;
 
 
@@ -155,7 +156,8 @@ void BLE_ProcessCommand(char commandType) {
 			break;
 
 		case 'V':
-			setpoint = dataFloat;
+			float set_setpoint = dataFloat;
+			setSetpoint(set_setpoint);
 			break;
 
 		case 'F':

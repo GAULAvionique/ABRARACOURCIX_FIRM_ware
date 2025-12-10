@@ -10,6 +10,7 @@
 
 void regulate(float setPointAngSpeed);
 float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, float * integralError);
+float ServoFilter(float PID_Output, float motor_intensity);
 void Set_PID(float _kp, float _ki, float _kd);
 void Set_Setpoint(float sp);
 void Set_motor_speed(uint8_t new_motor_speed);
@@ -26,6 +27,7 @@ float get_P();
 float get_I();
 float get_D();
 float get_setpoint();
+void setSetpoint(float p_setpoint);
 
 extern float setpoint;
 

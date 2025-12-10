@@ -6,7 +6,7 @@
  */
 
 #include "Servo.h"
-
+#include <math.h>
 
 static float min_range = 0.071;
 static float max_range = 0.105;
@@ -127,10 +127,6 @@ void set_max_range(float p_max_range){
 	update_mid_point();
 }
 
-// map intensité -> % range
-// assume des coefficients PID fixes
-
-//
 
 void update_range(float p_range){
 	p_range = p_range / 100.0;
@@ -173,7 +169,7 @@ float compute_corrected_duty(uint8_t servo_id, float duty){
 
 float compute_intensity_to_duty(float intensity){
 	float mapped_servo_command = 0.0;
-	mapped_servo_command = (0.26429 * intensity) +39.04;
+	mapped_servo_command = (0.26429 * intensity) + 39.04;
 	// s'assure que la commande peut pas aller au delà de 50. (le drone accelererait)
 	if (mapped_servo_command > 50.0){
 		mapped_servo_command = 50.0;
@@ -184,6 +180,7 @@ float compute_intensity_to_duty(float intensity){
 
 
 void set_motor_intensity(float intensity){
+
 	float center_duty = 0.0;
 
 	float null_speed_duty_cycle1 = 0.0;
@@ -208,13 +205,26 @@ void set_motor_intensity(float intensity){
 	epsilon_intensity[2] = null_speed_duty_cycle3 - (true_mid + epsilon[2]);
 	epsilon_intensity[3] = null_speed_duty_cycle4 - (true_mid + epsilon[3]);
 
+}
 
-	/*
-	set_offset(1, compute_corrected_duty(1, center_duty));
-	set_offset(2, compute_corrected_duty(2, center_duty));
-	set_offset(3, compute_corrected_duty(3, center_duty));
-	set_offset(4, compute_corrected_duty(4, center_duty));
-	*/
+void compute_operating_range(float intensity){
+	if(intensity < 10.0){
+		intensity = 10.0;
+	}
+
+	if(intensity > 40.0){
+		intensity = 0.0;
+	}
+
+	float range = 0.0796 * pow((intensity/100.0), -1.66);
+	update_range(range);
 
 }
+
+
+
+
+
+
+
 

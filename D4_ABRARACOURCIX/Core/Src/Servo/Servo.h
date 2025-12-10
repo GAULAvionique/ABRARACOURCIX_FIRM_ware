@@ -28,5 +28,6 @@ void init_offset();
 float get_duty_cycle();
 
 void set_motor_intensity(float intensity);
+void compute_operating_range(float intensity);
 
 #endif /* SRC_SERVO_SERVO_H_ */
