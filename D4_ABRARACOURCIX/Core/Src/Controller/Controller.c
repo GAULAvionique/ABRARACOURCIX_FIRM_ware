@@ -27,9 +27,9 @@ static int use_updated_pid = 0;
 static uint8_t motor_speed = 0.0;
 static float programmed_gains_P[PROGRAMMED_GAINS_LEN] = {0.0, 0.1, 0.3, 0.4};
 
-static float kp = 0.0003;
-static float kd = 0.0000;
-static float ki = 0.0001;
+static float kp = 1;
+static float kd = 2.5;
+static float ki = 0.8;
 
 float integralError = 0.0;
 
@@ -65,22 +65,16 @@ void regulate(float setPointAngSpeed){
 
 
 		if(setpoint_changed) {
-			if(previous_setpoint > cur_set_point) {
-				if(angSpeedZ < cur_set_point) {
+			if((previous_setpoint > cur_set_point && angSpeedZ < cur_set_point) || ( previous_setpoint < cur_set_point && angSpeedZ >  cur_set_point)){
 					integralError = 0.0;
 					setpoint_changed = 0;
+
 				}
 			}
-			/*else {
-				if(angSpeedZ > cur_set_point) {
-					integralError = 0.0;
-					setpoint_changed = 0;
-				}
-			}*/
-		}
+
 
 		commandServo = PICompute(kp, ki, angSpeedZ, setPointAngSpeed, &integralError);
-		commandServoFilter = ServoFilter(commandServo, 10);
+		commandServoFilter = ServoFilter(commandServo);
 
 		setAllServos(commandServoFilter);
 		//setAllServos(commandServo);
@@ -133,6 +127,7 @@ void set_scaling_factor(float p_scaling_factor){
 	scaling_factor = p_scaling_factor;
 }
 
+
 float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, float * integralError)
 {
 
@@ -144,7 +139,8 @@ float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, floa
     if(*integralError >  MAX_INTEG_ERROR) *integralError =  MAX_INTEG_ERROR;
     if(*integralError < MIN_INTEG_ERROR) *integralError = MIN_INTEG_ERROR;
 
-    d_input = (angSpeed - last_input);
+
+    d_input = (angSpeed - last_input) / dt;
 
     output = kp * speedError + ki * (*integralError) - kd*d_input;
 
@@ -159,9 +155,47 @@ float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, floa
     return output * scaling_factor;
 }
 
-float ServoFilter(float PID_Output, float motor_intensity)
+/*float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, float * integralError)
 {
-		size_window = 3;
+    speedError = (setPointAngSpeed - angSpeed);
+
+    // Intégration (sans clamp, car on met le back-calculation après)
+    *integralError += speedError * dt;
+    // Clamp integrator
+    if(*integralError >  MAX_INTEG_ERROR) *integralError =  MAX_INTEG_ERROR;
+    if(*integralError < MIN_INTEG_ERROR) *integralError = MIN_INTEG_ERROR;
+
+    // Dérivée corrigée
+    d_input = (angSpeed - last_input);
+
+    // PID non saturé
+    float unsat_output = kp * speedError + ki * (*integralError) - kd * d_input;
+
+    // Saturation
+    float sat_output = unsat_output;
+    if(sat_output > MAX_ANGLE) sat_output = MAX_ANGLE;
+    if(sat_output < MIN_ANGLE) sat_output = MIN_ANGLE;
+
+    // --- Anti-windup back-calculation ---
+    const float Kaw = 0.2f;  // Ajustable (0.05 à 0.2)
+    float aw_error = sat_output - unsat_output;
+    *integralError += Kaw * aw_error * dt;
+    // ------------------------------------
+
+    output = sat_output;
+    output = fmaxf(output, MIN_ANGLE);
+    output = fminf(output, MAX_ANGLE);
+
+    int_err = *integralError;
+    last_input = angSpeed;
+
+    return output * scaling_factor;
+}
+
+*/
+float ServoFilter(float PID_Output)
+{
+		size_window = 1;
 
 		moving_avg_sum += PID_Output;
 		moving_avg_sum -= moving_avg_data[moving_avg_index];
