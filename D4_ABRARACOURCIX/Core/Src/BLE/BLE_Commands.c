@@ -64,6 +64,7 @@ void BLE_ParseCommand(uint8_t *cmd) {
 				case 'c':
 				case 'd':
 				case 'e':
+				case 'f':
 					state = WaitFloat;
 					break;
 				default:
@@ -117,6 +118,7 @@ void BLE_ProcessCommand(char commandType) {
 			}
 
 			Motor_RampSpeed(motor_speed);
+			set_motor_intensity(motor_speed);
 			break;
 
 
@@ -142,7 +144,6 @@ void BLE_ProcessCommand(char commandType) {
 			break;
 
 		case 'Z':
-
 			uint32_t filter_id = dataInt;
 			IMU_SetFilter(filter_id);
 			break;
@@ -154,9 +155,7 @@ void BLE_ProcessCommand(char commandType) {
 			break;
 
 		case 'V':
-
 			setpoint = dataFloat;
-
 			break;
 
 		case 'F':
@@ -192,6 +191,10 @@ void BLE_ProcessCommand(char commandType) {
 		case 'e':
 			float range = dataFloat;
 			update_range(range);
+			break;
+		case 'f':
+			float scaling_factor = dataFloat;
+			set_scaling_factor(scaling_factor);
 			break;
 
 		default:

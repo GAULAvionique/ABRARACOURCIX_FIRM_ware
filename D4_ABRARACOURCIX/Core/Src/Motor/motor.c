@@ -8,6 +8,7 @@
 #include "stm32f4xx.h"
 #include "tim.h"
 #include "motor.h"
+#include "../Servo/Servo.h"
 #include "../Controller/Controller.h"
 
 #define MINIMUM_THROTLE_PULSE 1000 //us
@@ -40,6 +41,7 @@ void Motor_SetSpeed(uint8_t p_duty_cycle) {
 // Function to set motor speed gradually (pulse width in microseconds)
 void Motor_RampSpeed(uint8_t p_duty_cycle){
 	int step = 1;
+	set_motor_intensity((float)p_duty_cycle);
 	if (p_duty_cycle < current_duty_cycle)
 	{
 		step = -1;

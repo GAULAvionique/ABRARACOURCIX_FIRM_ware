@@ -42,14 +42,18 @@ static float last_input = 0.0f;
 
 static float cur_set_point = 0.0;
 
+static float scaling_factor = 1.0;
+
 void regulate(float setPointAngSpeed){
 
 	cur_set_point = setPointAngSpeed;
 
 	IMU_GetGyro(&angSpeedX, &angSpeedY, &angSpeedZ);
 	if(is_regulating){
+
 		commandServo = PICompute(kp, ki, angSpeedZ, setPointAngSpeed, &integralError);
 		setAllServos(commandServo);
+
 	}
 
 }
@@ -94,6 +98,10 @@ void set_Regulate(uint32_t set_regulate){
 	is_regulating = set_regulate;
 }
 
+void set_scaling_factor(float p_scaling_factor){
+	scaling_factor = p_scaling_factor;
+}
+
 float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, float * integralError)
 {
 
@@ -117,7 +125,7 @@ float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, floa
 
     last_input = angSpeed;
 
-    return output;
+    return output * scaling_factor;
 }
 
 
@@ -153,5 +161,6 @@ float get_D(){
 float get_setpoint(){
 	return cur_set_point;
 }
+
 
 

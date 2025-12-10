@@ -16,6 +16,7 @@ void Set_motor_speed(uint8_t new_motor_speed);
 void programmed_gains();
 
 void set_Regulate(uint32_t set_regulate);
+void set_scaling_factor(float p_scaling_factor);
 
 float get_ang_speed();
 float get_cmd_servo();

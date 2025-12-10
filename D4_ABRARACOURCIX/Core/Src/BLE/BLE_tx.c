@@ -19,7 +19,8 @@ const uint16_t SIZE_OF_CHAR = 1;
 
 
 void send_uint32_t_package(char header, uint32_t value){
-	char buffer[100] = {'0'};
+	char buffer[100];
+
 	uint16_t cxi = 0;
 	buffer[0] = header;
 	cxi = snprintf(buffer + SIZE_OF_CHAR, sizeof(buffer) - SIZE_OF_CHAR, "%"PRIu32";\n", value);
@@ -34,7 +35,7 @@ void send_float_package(char header, float value){
 	uint16_t cxf = 0;
 	buffer[0] = header;
 
-	cxf = snprintf(buffer + SIZE_OF_CHAR, sizeof(buffer) - SIZE_OF_CHAR, "%f;\n", value);
+	cxf = snprintf(buffer + SIZE_OF_CHAR, sizeof(buffer) - SIZE_OF_CHAR, "%.3f;\n", value);
 
 	BLE_SendData((uint8_t*)buffer, cxf+SIZE_OF_CHAR);
 	return;
