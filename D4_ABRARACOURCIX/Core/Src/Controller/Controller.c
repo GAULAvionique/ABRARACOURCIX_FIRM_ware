@@ -11,10 +11,14 @@
 #define PROGRAMMED_GAINS_LEN 4
 
 const float MAX_INTEG_ERROR = 40.0;
-const float MIN_INTEG_ERROR = -40.0;
+
 const float MAX_ANGLE = 100.0;
 const float MIN_ANGLE = 0.0;
-const float dt = 0.1;
+const float dt = 0.01;
+
+
+static float MAX_INTEG_ERROR = 50.0;
+static float MIN_INTEG_ERROR = -50.0;
 
 static uint32_t is_regulating = 1;
 
@@ -27,9 +31,11 @@ static int use_updated_pid = 0;
 static uint8_t motor_speed = 0.0;
 static float programmed_gains_P[PROGRAMMED_GAINS_LEN] = {0.0, 0.1, 0.3, 0.4};
 
-static float kp = 0.0003;
-static float kd = 0.0000;
-static float ki = 0.0001;
+static float kp = 0.5;
+static float kd = 0.0;
+static float ki = 0.11;
+static float dynamic_ki = 0.11;
+static float dynamic_ki_coeff = 1.0;
 
 float integralError = 0.0;
 
@@ -42,7 +48,7 @@ static float last_input = 0.0;
 
 static float cur_set_point = 0.0;
 
-static float scaling_factor = 1.0;
+static int servo_filter_lenght = 1;
 
 
 #define MAX_SIZE_WINDOW 	(20)
@@ -56,31 +62,41 @@ uint8_t setpoint_changed = 0;
 float previous_setpoint = 0;
 
 
+
 void regulate(float setPointAngSpeed){
 
 	cur_set_point = setPointAngSpeed;
 
 	IMU_GetGyro(&angSpeedX, &angSpeedY, &angSpeedZ);
-	if(is_regulating){
 
 
-		if(setpoint_changed) {
-			if(previous_setpoint > cur_set_point) {
-				if(angSpeedZ < cur_set_point) {
-					integralError = 0.0;
-					setpoint_changed = 0;
-				}
-			}
-			/*else {
-				if(angSpeedZ > cur_set_point) {
+	if(is_regulating)
+	{
+		/*if(setpoint_changed)
+		 * {
+			if((previous_setpoint > cur_set_point && angSpeedZ < cur_set_point) || ( previous_setpoint < cur_set_point && angSpeedZ >  cur_set_point))
+				{
 					integralError = 0.0;
 					setpoint_changed = 0;
 				}
 			}*/
+
+		if(last_input - angSpeedZ < 0){ // accel
+			dynamic_ki = ki;
+		}
+		else{ // decel
+			dynamic_ki = ki * dynamic_ki_coeff;
 		}
 
-		commandServo = PICompute(kp, ki, angSpeedZ, setPointAngSpeed, &integralError);
-		commandServoFilter = ServoFilter(commandServo, 10);
+		if(setpoint_changed)
+		{
+			integralError = 0.0;
+			setpoint_changed = 0;
+		}
+
+
+		commandServo = PICompute(kp, dynamic_ki, angSpeedZ, setPointAngSpeed, &integralError);
+		commandServoFilter = ServoFilter(commandServo);
 
 		setAllServos(commandServoFilter);
 		//setAllServos(commandServo);
@@ -129,14 +145,12 @@ void set_Regulate(uint32_t set_regulate){
 	is_regulating = set_regulate;
 }
 
-void set_scaling_factor(float p_scaling_factor){
-	scaling_factor = p_scaling_factor;
+void set_servo_filter_lenght(int p_servo_filter_lenght){
+	servo_filter_lenght = p_servo_filter_lenght;
 }
 
 float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, float * integralError)
 {
-
-
     speedError = (setPointAngSpeed - angSpeed);
     *integralError += speedError * dt;
 
@@ -156,12 +170,12 @@ float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, floa
 
     last_input = angSpeed;
 
-    return output * scaling_factor;
+    return output;
 }
 
-float ServoFilter(float PID_Output, float motor_intensity)
+float ServoFilter(float PID_Output)
 {
-		size_window = 3;
+		size_window = servo_filter_lenght;
 
 		moving_avg_sum += PID_Output;
 		moving_avg_sum -= moving_avg_data[moving_avg_index];
@@ -177,6 +191,18 @@ void setSetpoint(float p_setpoint) {
 	previous_setpoint = setpoint;
 	setpoint = p_setpoint;
 	setpoint_changed = 1;
+}
+
+void set_dynamic_ki(float p_dynamic_ki){
+	dynamic_ki_coeff = p_dynamic_ki;
+}
+
+void set_min_integ(float min_integ){
+	MIN_INTEG_ERROR = min_integ;
+}
+
+void set_max_integ(float max_integ){
+	MAX_INTEG_ERROR = max_integ;
 }
 
 float get_ang_speed(){
@@ -210,6 +236,8 @@ float get_D(){
 float get_setpoint(){
 	return cur_set_point;
 }
+
+
 
 
 

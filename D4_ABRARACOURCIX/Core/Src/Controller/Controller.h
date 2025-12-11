@@ -10,7 +10,7 @@
 
 void regulate(float setPointAngSpeed);
 float PICompute(float kp, float ki, float angSpeed, float setPointAngSpeed, float * integralError);
-float ServoFilter(float PID_Output, float motor_intensity);
+float ServoFilter(float PID_Output);
 void Set_PID(float _kp, float _ki, float _kd);
 void Set_Setpoint(float sp);
 void Set_motor_speed(uint8_t new_motor_speed);
@@ -18,6 +18,11 @@ void programmed_gains();
 
 void set_Regulate(uint32_t set_regulate);
 void set_scaling_factor(float p_scaling_factor);
+void set_servo_filter_lenght(int p_servo_filter_lenght);
+void set_dynamic_ki(float p_dynamic_ki);
+void set_min_integ(float min_integ);
+void set_max_integ(float max_integ);
+
 
 float get_ang_speed();
 float get_cmd_servo();

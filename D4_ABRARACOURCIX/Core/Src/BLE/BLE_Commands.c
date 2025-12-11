@@ -51,6 +51,7 @@ void BLE_ParseCommand(uint8_t *cmd) {
 				case 'S':
 				case 'Z':
 				case 'G':
+				case 'f':
 					state = WaitInt;
 					break;
 				case 'P':
@@ -64,7 +65,9 @@ void BLE_ParseCommand(uint8_t *cmd) {
 				case 'c':
 				case 'd':
 				case 'e':
-				case 'f':
+				case 'g':
+				case 'h':
+				case 'i':
 					state = WaitFloat;
 					break;
 				default:
@@ -195,10 +198,21 @@ void BLE_ProcessCommand(char commandType) {
 			update_range(range);
 			break;
 		case 'f':
-			float scaling_factor = dataFloat;
-			set_scaling_factor(scaling_factor);
+			int servo_filter_lenght = dataInt;
+			set_servo_filter_lenght(servo_filter_lenght);
 			break;
-
+		case 'g':
+			float ki_coeff = dataFloat;
+			set_dynamic_ki(ki_coeff);
+			break;
+		case 'h':
+			float min_integ = dataFloat;
+			set_min_integ(min_integ);
+			break;
+		case 'i':
+			float max_integ = dataFloat;
+			set_max_integ(max_integ);
+			break;
 		default:
 			break;
 	}

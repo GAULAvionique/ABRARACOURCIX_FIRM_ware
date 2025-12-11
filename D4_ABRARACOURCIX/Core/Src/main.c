@@ -103,7 +103,6 @@ float	battery_conv = (float)battery * 3.3 / 4096.0;
 // FONCTION POUR METTRE À JOUR LE DISPLAY DATA
 
 static int angular_speed = 0.0;
-static float cmd_servo = 0.0;
 static float bat_current = 0.0;
 static float current_set_point = 0.0;
 static float bat_voltage = 0.0;
@@ -113,7 +112,6 @@ static float P = 0.0;
 static float I = 0.0;
 static float D = 0.0;
 static int time_tick = 0;
-static int filter_type = 0;
 static float m_duty_cycle = 0.0;
 
 
@@ -147,7 +145,7 @@ void disp_variables(){
 
 }
 
-
+static uint32_t counter = 0;
 static int ready_to_send = 0;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
 {
@@ -155,7 +153,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
     {
     	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_1);
     	regulate(setpoint);
-    	ready_to_send = 1;
+    	if(counter == 9)
+    	{
+    		ready_to_send = 1;
+    		counter = 0;
+    	}
+    	counter++;
+
 
     }
 }
