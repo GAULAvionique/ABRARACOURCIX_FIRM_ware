@@ -153,7 +153,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
     {
     	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_1);
     	regulate(setpoint);
-    	if(counter == 9)
+    	if(counter == 10)
     	{
     		ready_to_send = 1;
     		counter = 0;
